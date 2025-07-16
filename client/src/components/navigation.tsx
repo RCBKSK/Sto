@@ -51,7 +51,7 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex space-x-2">
             {navigation.map((item) => {
               if (item.name === "Products") {
                 return (
@@ -59,7 +59,7 @@ export default function Navigation() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="text-stone-dark hover:text-stone-bronze hover:bg-stone-beige/50 transition-all duration-200 flex items-center"
+                        className="text-stone-dark hover:text-white hover:bg-stone-bronze transition-all duration-200 flex items-center font-semibold px-4 py-2 rounded-lg"
                       >
                         {item.name} <ChevronDown className="ml-1 h-4 w-4" />
                       </Button>
@@ -85,8 +85,10 @@ export default function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`text-stone-dark hover:text-stone-bronze hover:bg-stone-beige/50 px-3 py-2 rounded-lg transition-all duration-200 ${
-                    location === item.href ? "text-stone-bronze bg-stone-beige/30" : ""
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    location === item.href
+                      ? "text-white bg-stone-bronze shadow-lg"
+                      : "text-stone-dark hover:text-white hover:bg-stone-bronze/90 hover:shadow-md"
                   }`}
                 >
                   {item.name}

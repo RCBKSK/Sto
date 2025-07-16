@@ -31,7 +31,7 @@ export default function Products() {
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "" || selectedCategory === "All" || 
+    const matchesCategory = selectedCategory === "" || selectedCategory === "All" || selectedCategory === "all" || 
                            product.category.toLowerCase() === selectedCategory.toLowerCase();
     
     return matchesSearch && matchesCategory;
@@ -85,7 +85,7 @@ export default function Products() {
               </SelectTrigger>
               <SelectContent>
                 {categories.map(category => (
-                  <SelectItem key={category} value={category === "All" ? "" : category}>
+                  <SelectItem key={category} value={category === "All" ? "all" : category}>
                     {category}
                   </SelectItem>
                 ))}

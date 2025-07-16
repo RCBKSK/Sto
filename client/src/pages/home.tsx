@@ -79,68 +79,82 @@ export default function Home() {
       <Statistics />
 
       {/* Advanced Tools Section */}
-      <section className="py-20 bg-gradient-to-br from-stone-dark to-stone-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gradient-to-br from-stone-beige via-white to-stone-beige relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,_#D4A574_1px,_transparent_1px)] bg-[length:50px_50px]" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Advanced Tools & Features</h2>
-            <p className="text-xl text-stone-beige max-w-3xl mx-auto">
-              Experience our cutting-edge technology to visualize, calculate, and plan your stone projects
+            <h2 className="text-4xl md:text-5xl font-bold text-stone-dark mb-4 bg-gradient-to-r from-stone-dark via-stone-bronze to-stone-gold bg-clip-text text-transparent">
+              Advanced Digital Tools
+            </h2>
+            <p className="text-xl text-stone-gray max-w-3xl mx-auto">
+              Experience the future of stone selection with our cutting-edge technology and personalized service
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Scan className="h-8 w-8 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* AR Preview Tool */}
+            <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-stone-200/50 hover:border-blue-300/50 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Scan className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-dark mb-4 group-hover:text-blue-600 transition-colors">AR Preview</h3>
+                <p className="text-stone-gray mb-6 leading-relaxed">Visualize stones in your space using cutting-edge augmented reality technology. See exactly how your chosen stone will look before installation.</p>
+                <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link href="/products">Experience AR View</Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">AR Preview</h3>
-              <p className="text-stone-beige mb-4">Visualize stones in your space using augmented reality</p>
-              <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-                <Link href="/products">View Products</Link>
-              </Button>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Calculator className="h-8 w-8 text-white" />
+            {/* Price Calculator Tool */}
+            <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-stone-200/50 hover:border-green-300/50 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Calculator className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-dark mb-4 group-hover:text-green-600 transition-colors">Smart Calculator</h3>
+                <p className="text-stone-gray mb-6 leading-relaxed">Get instant, accurate pricing estimates for your stone projects. Configure dimensions, finishes, and installation options for precise quotes.</p>
+                <Button asChild className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link href="/products">Calculate Price</Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Price Calculator</h3>
-              <p className="text-stone-beige mb-4">Get instant pricing for your stone projects</p>
-              <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white">
-                <Link href="/products">Calculate Price</Link>
-              </Button>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <MessageCircle className="h-8 w-8 text-white" />
+            {/* Live Chat Tool */}
+            <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-stone-200/50 hover:border-purple-300/50 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <MessageCircle className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-dark mb-4 group-hover:text-purple-600 transition-colors">Expert Chat</h3>
+                <p className="text-stone-gray mb-6 leading-relaxed">Connect instantly with our stone specialists. Get expert advice, design recommendations, and technical support in real-time.</p>
+                <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link href="/contact">Start Chat</Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Live Chat</h3>
-              <p className="text-stone-beige mb-4">Get instant support from our stone experts</p>
-              <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-                <Link href="/contact">Start Chat</Link>
-              </Button>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
-              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Calendar className="h-8 w-8 text-white" />
+            {/* Consultation Booking Tool */}
+            <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-stone-200/50 hover:border-orange-300/50 transform hover:-translate-y-2">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Calendar className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-dark mb-4 group-hover:text-orange-600 transition-colors">Personal Consultation</h3>
+                <p className="text-stone-gray mb-6 leading-relaxed">Schedule a one-on-one meeting with our design experts. Get personalized recommendations and professional guidance for your project.</p>
+                <Button asChild className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link href="/contact">Book Consultation</Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Book Consultation</h3>
-              <p className="text-stone-beige mb-4">Schedule a meeting with our design experts</p>
-              <Button asChild className="bg-purple-500 hover:bg-purple-600 text-white">
-                <Link href="/contact">Book Now</Link>
-              </Button>
             </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <Button asChild size="lg" className="bg-stone-bronze hover:bg-orange-600 text-white">
-              <Link href="/products">
-                <ArrowRight className="mr-2 h-5 w-5" />
-                View All Products
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
