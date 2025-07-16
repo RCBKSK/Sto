@@ -4,6 +4,7 @@ import { useLocation, Link } from "wouter";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import LiveChat from "@/components/live-chat";
+import FloatingCart from "@/components/floating-cart";
 import PriceCalculator from "@/components/price-calculator";
 import ARPreview from "@/components/ar-preview";
 import { Button } from "@/components/ui/button";
@@ -222,6 +223,7 @@ export default function Products() {
 
       <Footer />
       <LiveChat />
+      <FloatingCart />
     </div>
   );
 }

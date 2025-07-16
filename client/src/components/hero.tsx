@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowRight, Phone, ShoppingCart } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { useCart } from "@/contexts/cart-context";
 
 export default function Hero() {
   const { t, language } = useLanguage();
+  const { getTotalItems } = useCart();
+  const cartItems = getTotalItems();
   
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -84,6 +87,29 @@ export default function Hero() {
               {t("hero.exploreProducts")}
             </Link>
           </Button>
+          
+          {/* Cart Button - More prominent when items in cart */}
+          <Button 
+            asChild 
+            variant="outline" 
+            size="lg" 
+            className={`border-2 backdrop-blur-sm px-8 py-4 text-lg transform hover:scale-105 transition-all duration-300 relative ${
+              cartItems > 0 
+                ? 'border-stone-gold bg-stone-gold/20 text-stone-gold hover:bg-stone-gold hover:text-stone-dark animate-pulse' 
+                : 'border-white/30 text-white hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            <Link href="/cart">
+              <ShoppingCart className={`h-5 w-5 ${language === 'fa' ? 'ml-2' : 'mr-2'}`} />
+              {cartItems > 0 ? `Cart (${cartItems})` : 'View Cart'}
+              {cartItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                  {cartItems > 9 ? "9+" : cartItems}
+                </span>
+              )}
+            </Link>
+          </Button>
+          
           <Button 
             asChild 
             variant="outline" 

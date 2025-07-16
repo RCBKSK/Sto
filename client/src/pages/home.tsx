@@ -13,6 +13,7 @@ import Newsletter from "@/components/newsletter";
 import EnhancedCTA from "@/components/enhanced-cta";
 import BackToTop from "@/components/back-to-top";
 import LiveChat from "@/components/live-chat";
+import FloatingCart from "@/components/floating-cart";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -451,6 +452,7 @@ export default function Home() {
       <Footer />
       <BackToTop />
       <LiveChat />
+      <FloatingCart />
     </div>
   );
 }
