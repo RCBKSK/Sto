@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight, Phone } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 export default function Hero() {
+  const { t, language } = useLanguage();
+  
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Animated background particles */}
@@ -22,34 +25,34 @@ export default function Hero() {
         }}
       ></div>
       
-      <div className="relative z-20 text-center text-white max-w-5xl mx-auto px-4">
+      <div className={`relative z-20 text-center text-white max-w-5xl mx-auto px-4 ${language === 'fa' ? 'font-vazir' : ''}`}>
         <div className="mb-6">
           <span className="inline-block px-4 py-2 bg-stone-bronze/20 backdrop-blur-sm rounded-full text-stone-cream text-sm font-medium border border-stone-cream/30">
-            Premium Natural Stone Since 2010
+            {t("hero.badge")}
           </span>
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-          Elegance with <span className="text-stone-gold bg-gradient-to-r from-stone-gold to-stone-cream bg-clip-text text-transparent">Timeless</span><br />
-          Natural Stone Cladding
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight break-words">
+          {t("hero.title1")} <span className="text-stone-gold bg-gradient-to-r from-stone-gold to-stone-cream bg-clip-text text-transparent">{t("hero.title2")}</span>
+          <br />
+          {t("hero.title3")}
         </h1>
-        <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-3xl mx-auto leading-relaxed">
-          Cladding Natural Stone is an innovative natural stone supplier known for its exceptional quality 
-          and distinctive designs featured in our extensive portfolio of over 55 products with 400+ material references.
+        <p className="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200 max-w-4xl mx-auto leading-relaxed">
+          {t("hero.description")}
         </p>
         
         {/* Trust indicators */}
-        <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm text-stone-cream/80">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 text-sm text-stone-cream/80">
           <div className="flex items-center">
-            <span className="w-2 h-2 bg-stone-gold rounded-full mr-2"></span>
-            15+ Years Experience
+            <span className={`w-2 h-2 bg-stone-gold rounded-full ${language === 'fa' ? 'ml-2' : 'mr-2'}`}></span>
+            {t("hero.experience")}
           </div>
           <div className="flex items-center">
-            <span className="w-2 h-2 bg-stone-gold rounded-full mr-2"></span>
-            362+ Happy Clients
+            <span className={`w-2 h-2 bg-stone-gold rounded-full ${language === 'fa' ? 'ml-2' : 'mr-2'}`}></span>
+            {t("hero.clients")}
           </div>
           <div className="flex items-center">
-            <span className="w-2 h-2 bg-stone-gold rounded-full mr-2"></span>
-            Premium Quality Guaranteed
+            <span className={`w-2 h-2 bg-stone-gold rounded-full ${language === 'fa' ? 'ml-2' : 'mr-2'}`}></span>
+            {t("hero.quality")}
           </div>
         </div>
         
@@ -60,8 +63,8 @@ export default function Hero() {
             className="bg-gradient-stone hover:shadow-stone-lg text-white px-8 py-4 text-lg transform hover:scale-105 transition-all duration-300"
           >
             <Link href="/products">
-              <ArrowRight className="mr-2 h-5 w-5" />
-              Explore Products
+              <ArrowRight className={`h-5 w-5 ${language === 'fa' ? 'ml-2 rotate-180' : 'mr-2'}`} />
+              {t("hero.exploreProducts")}
             </Link>
           </Button>
           <Button 
@@ -71,8 +74,8 @@ export default function Hero() {
             className="border-2 border-white/30 backdrop-blur-sm text-white hover:bg-white/10 hover:text-white px-8 py-4 text-lg transform hover:scale-105 transition-all duration-300"
           >
             <Link href="/contact">
-              <Phone className="mr-2 h-5 w-5" />
-              Get Free Quote
+              <Phone className={`h-5 w-5 ${language === 'fa' ? 'ml-2' : 'mr-2'}`} />
+              {t("hero.getFreeQuote")}
             </Link>
           </Button>
         </div>

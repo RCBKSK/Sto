@@ -8,19 +8,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage } from "@/contexts/language-context";
+import LanguageSwitcher from "@/components/language-switcher";
+import CartButton from "@/components/cart-button";
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { t, language } = useLanguage();
 
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
-    { name: "Services", href: "/services" },
-    { name: "Gallery", href: "/gallery" },
-    { name: "About", href: "/about" },
-    { name: "Blog", href: "/blog" },
-    { name: "Contact", href: "/contact" },
+    { name: t("nav.home"), href: "/" },
+    { name: t("nav.products"), href: "/products" },
+    { name: t("nav.services"), href: "/services" },
+    { name: t("nav.gallery"), href: "/gallery" },
+    { name: t("nav.about"), href: "/about" },
+    { name: t("nav.blog"), href: "/blog" },
+    { name: t("nav.contact"), href: "/contact" },
   ];
 
   const productCategories = [
@@ -31,7 +35,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md shadow-stone sticky top-0 z-50 border-b border-stone-beige">
+    <nav className={`bg-white/95 backdrop-blur-md shadow-stone sticky top-0 z-50 border-b border-stone-beige ${language === 'fa' ? 'font-vazir' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-18">
           {/* Enhanced Logo */}
@@ -41,7 +45,7 @@ export default function Navigation() {
                 <span className="text-white font-bold text-lg">E</span>
               </div>
               <div className="font-bold text-xl text-stone-dark group-hover:text-stone-bronze transition-colors">
-                <span className="text-stone-bronze">Elegance</span> Stone
+                <span className="text-stone-bronze">{language === 'fa' ? 'اِلِگانس' : 'Elegance'}</span> {language === 'fa' ? 'سنگ' : 'Stone'}
               </div>
             </div>
           </Link>
@@ -91,13 +95,15 @@ export default function Navigation() {
             })}
           </div>
 
-          {/* Contact Button */}
-          <div className="hidden md:block">
+          {/* Actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
+            <CartButton />
             <Button 
               asChild
               className="bg-gradient-stone hover:shadow-stone-lg text-white transform hover:scale-105 transition-all duration-300 animate-pulse-glow"
             >
-              <Link href="/contact">Get Quote</Link>
+              <Link href="/contact">{t("nav.getQuote")}</Link>
             </Button>
           </div>
 

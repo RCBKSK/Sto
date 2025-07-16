@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -203,5 +205,24 @@
   
   .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  .font-vazir {
+    font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+  
+  [dir="rtl"] .space-x-4 > * + * {
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+  
+  [dir="rtl"] .space-x-2 > * + * {
+    margin-left: 0;
+    margin-right: 0.5rem;
   }
 }
