@@ -18,12 +18,29 @@ export default function Hero() {
       
       {/* Enhanced background with overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-stone-dark/90 via-stone-gray/70 to-stone-bronze/60 z-10"></div>
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105 transition-transform duration-20000 hover:scale-110"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080')"
-        }}
-      ></div>
+      {/* Beautiful stone texture background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-stone-800 to-amber-900"></div>
+      <div className="absolute inset-0 opacity-40">
+        <svg width="100%" height="100%" className="absolute inset-0">
+          <defs>
+            <pattern id="stone-texture" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+              <rect width="200" height="200" fill="#2c2c2c"/>
+              <circle cx="50" cy="50" r="30" fill="#3c3c3c" opacity="0.3"/>
+              <circle cx="150" cy="120" r="25" fill="#4c4c4c" opacity="0.2"/>
+              <circle cx="80" cy="160" r="35" fill="#383838" opacity="0.4"/>
+              <polygon points="120,20 140,60 100,80 80,40" fill="#444" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#stone-texture)"/>
+        </svg>
+      </div>
+      
+      {/* Floating stone elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-32 h-24 bg-gradient-to-br from-amber-600/20 to-stone-700/20 rounded-3xl transform rotate-12 animate-float"></div>
+        <div className="absolute top-1/3 right-1/4 w-24 h-32 bg-gradient-to-br from-stone-600/20 to-amber-700/20 rounded-3xl transform -rotate-12 animate-float-delay"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-28 h-20 bg-gradient-to-br from-stone-500/20 to-amber-800/20 rounded-3xl transform rotate-6 animate-float"></div>
+      </div>
       
       <div className={`relative z-20 text-center text-white max-w-5xl mx-auto px-4 ${language === 'fa' ? 'font-vazir' : ''}`}>
         <div className="mb-6">

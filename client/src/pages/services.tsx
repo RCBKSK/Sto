@@ -5,8 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle, Hammer, Palette, Shield, Users, Wrench } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 export default function Services() {
+  const { t, language } = useLanguage();
+  
   const services = [
     {
       icon: <Palette className="h-8 w-8" />,

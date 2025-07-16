@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { ArrowRight, Award, Heart, Shield, Star } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 export default function About() {
+  const { t, language } = useLanguage();
+  
   const values = [
     {
       icon: <Star className="h-8 w-8" />,
-      title: "Excellence",
-      description: "We are committed to delivering exceptional quality in every project, using only the finest natural stone materials and craftsmanship."
+      title: t("features.premium"),
+      description: t("features.premiumDesc")
     },
     {
       icon: <Heart className="h-8 w-8" />,
@@ -67,12 +70,11 @@ export default function About() {
       <section className="py-20 bg-stone-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-stone-dark mb-6">
-              About Elegance Stone
+            <h1 className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}>
+              {t("about.title")}
             </h1>
-            <p className="text-xl text-stone-gray max-w-2xl mx-auto">
-              For over a decade, we have been transforming spaces with the timeless beauty 
-              of natural stone, combining traditional craftsmanship with modern innovation.
+            <p className={`text-xl text-stone-gray max-w-2xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}>
+              {t("about.subtitle")}
             </p>
           </div>
         </div>

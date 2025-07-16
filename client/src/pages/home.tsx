@@ -10,7 +10,7 @@ import Features from "@/components/features";
 import Testimonials from "@/components/testimonials";
 import FAQ from "@/components/faq";
 import Newsletter from "@/components/newsletter";
-import CTASection from "@/components/cta-section";
+import EnhancedCTA from "@/components/enhanced-cta";
 import BackToTop from "@/components/back-to-top";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -181,7 +181,7 @@ export default function Home() {
       </section>
 
       <FAQ />
-      <CTASection />
+      <EnhancedCTA />
       <Newsletter />
       <Footer />
       <BackToTop />

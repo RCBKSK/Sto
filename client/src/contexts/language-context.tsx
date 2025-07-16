@@ -95,6 +95,58 @@ const translations = {
     "common.price": "Price",
     "common.category": "Category",
     "common.readMore": "Read More",
+    
+    // About Page
+    "about.title": "About Elegance Stone",
+    "about.subtitle": "Crafting Excellence in Natural Stone for Over a Decade",
+    "about.description": "Founded in 2010, Elegance Stone has been at the forefront of natural stone supply and installation. We specialize in premium marble, granite, travertine, and slate products that transform spaces into works of art.",
+    "about.mission": "Our Mission",
+    "about.missionText": "To provide the highest quality natural stone products with exceptional craftsmanship and unparalleled customer service.",
+    "about.vision": "Our Vision",
+    "about.visionText": "To be the leading natural stone supplier, setting industry standards for quality, innovation, and sustainability.",
+    
+    // Services Page
+    "services.title": "Our Services",
+    "services.subtitle": "Comprehensive Natural Stone Solutions",
+    "services.consultation": "Design Consultation",
+    "services.consultationDesc": "Expert design advice to help you choose the perfect stone for your project.",
+    "services.installation": "Professional Installation",
+    "services.installationDesc": "Skilled craftsmen ensure perfect installation with attention to every detail.",
+    "services.maintenance": "Maintenance & Restoration",
+    "services.maintenanceDesc": "Keep your natural stone looking pristine with our maintenance services.",
+    
+    // Gallery Page
+    "gallery.title": "Project Gallery",
+    "gallery.subtitle": "Showcasing Our Finest Work",
+    "gallery.category.all": "All Projects",
+    "gallery.category.residential": "Residential",
+    "gallery.category.commercial": "Commercial",
+    "gallery.category.outdoor": "Outdoor",
+    
+    // Contact Page
+    "contact.title": "Contact Us",
+    "contact.subtitle": "Get in touch for your next project",
+    "contact.name": "Full Name",
+    "contact.email": "Email Address",
+    "contact.phone": "Phone Number",
+    "contact.projectType": "Project Type",
+    "contact.message": "Message",
+    "contact.send": "Send Message",
+    "contact.info": "Contact Information",
+    "contact.address": "Address",
+    "contact.workingHours": "Working Hours",
+    "contact.mondayFriday": "Monday - Friday: 8:00 AM - 6:00 PM",
+    "contact.saturday": "Saturday: 9:00 AM - 4:00 PM",
+    "contact.sunday": "Sunday: Closed",
+    
+    // Blog Page
+    "blog.title": "Latest News & Insights",
+    "blog.subtitle": "Stay updated with the latest trends in natural stone",
+    "blog.readTime": "min read",
+    "blog.author": "By",
+    "blog.categories": "Categories",
+    "blog.tags": "Tags",
+    "blog.relatedPosts": "Related Posts",
   },
   fa: {
     // Navigation
@@ -180,6 +232,58 @@ const translations = {
     "common.price": "قیمت",
     "common.category": "دسته‌بندی",
     "common.readMore": "ادامه مطلب",
+    
+    // About Page
+    "about.title": "درباره سنگ اِلِگانس",
+    "about.subtitle": "ساخت تعالی در سنگ طبیعی برای بیش از یک دهه",
+    "about.description": "سنگ اِلِگانس که در سال ۲۰۱۰ تاسیس شد، در زمینه تامین و نصب سنگ طبیعی پیشرو بوده است. ما در محصولات مرمر، گرانیت، تراورتن و لاشه پریمیوم تخصص داریم که فضاها را به آثار هنری تبدیل می‌کند.",
+    "about.mission": "مأموریت ما",
+    "about.missionText": "ارائه بالاترین کیفیت محصولات سنگ طبیعی با صنعتگری استثنایی و خدمات مشتریان بی‌نظیر.",
+    "about.vision": "چشم‌انداز ما",
+    "about.visionText": "پیشرو در تامین سنگ طبیعی و تعیین استانداردهای صنعتی برای کیفیت، نوآوری و پایداری.",
+    
+    // Services Page
+    "services.title": "خدمات ما",
+    "services.subtitle": "راه‌حل‌های جامع سنگ طبیعی",
+    "services.consultation": "مشاوره طراحی",
+    "services.consultationDesc": "مشاوره تخصصی طراحی برای انتخاب سنگ مناسب پروژه شما.",
+    "services.installation": "نصب حرفه‌ای",
+    "services.installationDesc": "صنعتگران ماهر نصب کامل با توجه به تمام جزئیات را تضمین می‌کنند.",
+    "services.maintenance": "نگهداری و بازسازی",
+    "services.maintenanceDesc": "سنگ طبیعی خود را با خدمات نگهداری ما در حالت بکر نگه دارید.",
+    
+    // Gallery Page
+    "gallery.title": "گالری پروژه",
+    "gallery.subtitle": "نمایش بهترین کارهای ما",
+    "gallery.category.all": "تمام پروژه‌ها",
+    "gallery.category.residential": "مسکونی",
+    "gallery.category.commercial": "تجاری",
+    "gallery.category.outdoor": "فضای باز",
+    
+    // Contact Page
+    "contact.title": "تماس با ما",
+    "contact.subtitle": "برای پروژه بعدی خود با ما در تماس باشید",
+    "contact.name": "نام کامل",
+    "contact.email": "آدرس ایمیل",
+    "contact.phone": "شماره تلفن",
+    "contact.projectType": "نوع پروژه",
+    "contact.message": "پیام",
+    "contact.send": "ارسال پیام",
+    "contact.info": "اطلاعات تماس",
+    "contact.address": "آدرس",
+    "contact.workingHours": "ساعات کاری",
+    "contact.mondayFriday": "دوشنبه - جمعه: ۸:۰۰ صبح - ۶:۰۰ عصر",
+    "contact.saturday": "شنبه: ۹:۰۰ صبح - ۴:۰۰ عصر",
+    "contact.sunday": "یکشنبه: تعطیل",
+    
+    // Blog Page
+    "blog.title": "آخرین اخبار و بینش‌ها",
+    "blog.subtitle": "با آخرین روندهای سنگ طبیعی به‌روز بمانید",
+    "blog.readTime": "دقیقه مطالعه",
+    "blog.author": "توسط",
+    "blog.categories": "دسته‌بندی‌ها",
+    "blog.tags": "برچسب‌ها",
+    "blog.relatedPosts": "مطالب مرتبط",
   }
 };
 
