@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Filter, Calculator, Scan } from "lucide-react";
+import { Search, Filter, Calculator, Scan, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
+import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@shared/schema";
 import { products, categories } from "@/data/products";
 
@@ -23,6 +25,17 @@ export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter);
   const [sortBy, setSortBy] = useState("name");
+  
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = (product: Product) => {
+    addItem(product);
+    toast({
+      title: "Success",
+      description: `${product.name} added to cart`,
+    });
+  };
 
   // Use local product data for complete product catalog
   const allProducts = products;
@@ -150,7 +163,9 @@ export default function Products() {
                           size="sm" 
                           className="bg-stone-bronze hover:bg-orange-600 text-white"
                           disabled={!product.inStock}
+                          onClick={() => handleAddToCart(product)}
                         >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
                           {product.inStock ? "Add to Cart" : "Out of Stock"}
                         </Button>
                         {product.inStock && (

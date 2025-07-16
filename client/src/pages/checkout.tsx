@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCart } from "@/contexts/cart-context";
 import { useLanguage } from "@/contexts/language-context";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Bitcoin, Banknote } from "lucide-react";
+import { CreditCard, Bitcoin, Banknote, Wallet, Shield, CheckCircle } from "lucide-react";
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -56,10 +56,14 @@ export default function Checkout() {
               </CardHeader>
               <CardContent>
                 <Tabs value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <TabsList className="grid w-full grid-cols-3">
+                  <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="card" className="flex items-center space-x-2">
                       <CreditCard className="h-4 w-4" />
                       <span>{language === 'fa' ? 'کارت' : 'Card'}</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="wallet" className="flex items-center space-x-2">
+                      <Wallet className="h-4 w-4" />
+                      <span>{language === 'fa' ? 'کیف پول' : 'Wallet'}</span>
                     </TabsTrigger>
                     <TabsTrigger value="crypto" className="flex items-center space-x-2">
                       <Bitcoin className="h-4 w-4" />
@@ -89,6 +93,73 @@ export default function Checkout() {
                     <div className="space-y-2">
                       <Label htmlFor="cardHolder">{t("payment.cardHolder")}</Label>
                       <Input id="cardHolder" placeholder="John Doe" />
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="wallet" className="space-y-4 mt-6">
+                    <div className="space-y-4">
+                      <div className="text-center mb-6">
+                        <Shield className="h-12 w-12 text-blue-600 mx-auto mb-2" />
+                        <h3 className="text-lg font-semibold mb-2">
+                          {language === 'fa' ? 'پرداخت امن با کیف پول دیجیتال' : 'Secure Digital Wallet Payment'}
+                        </h3>
+                        <p className="text-stone-gray text-sm">
+                          {language === 'fa' 
+                            ? 'سریع، امن و راحت' 
+                            : 'Fast, secure, and convenient'
+                          }
+                        </p>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-3">
+                        <Button 
+                          variant="outline" 
+                          className="p-4 h-auto border-blue-200 hover:border-blue-400 hover:bg-blue-50"
+                          onClick={() => handlePayment()}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">PP</span>
+                            </div>
+                            <div className="text-left">
+                              <div className="font-semibold">PayPal</div>
+                              <div className="text-sm text-stone-gray">Pay with your PayPal account</div>
+                            </div>
+                          </div>
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          className="p-4 h-auto border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+                          onClick={() => handlePayment()}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">🍎</span>
+                            </div>
+                            <div className="text-left">
+                              <div className="font-semibold">Apple Pay</div>
+                              <div className="text-sm text-stone-gray">Pay with Touch ID or Face ID</div>
+                            </div>
+                          </div>
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          className="p-4 h-auto border-green-200 hover:border-green-400 hover:bg-green-50"
+                          onClick={() => handlePayment()}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">G</span>
+                            </div>
+                            <div className="text-left">
+                              <div className="font-semibold">Google Pay</div>
+                              <div className="text-sm text-stone-gray">Pay with your Google account</div>
+                            </div>
+                          </div>
+                        </Button>
+                      </div>
                     </div>
                   </TabsContent>
                   
