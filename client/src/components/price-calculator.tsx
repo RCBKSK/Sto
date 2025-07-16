@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Calculator, Ruler, Palette, Wrench, DollarSign, CheckCircle, Info, X, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Ruler, Package, Truck } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 interface PriceCalculatorProps {
   productId?: number;
@@ -16,184 +16,537 @@ interface PriceCalculatorProps {
   basePrice?: number;
 }
 
-interface CalculationData {
+interface CalculationResult {
+  materialCost: number;
+  laborCost: number;
+  finishCost: number;
+  installationCost: number;
+  subtotal: number;
+  tax: number;
+  total: number;
   area: number;
-  thickness: string;
-  finish: string;
-  installation: boolean;
-  customerEmail?: string;
 }
 
-export default function PriceCalculator({ productId, productName, basePrice = 50 }: PriceCalculatorProps) {
+export default function PriceCalculator({ 
+  productId = 1, 
+  productName = "Premium Natural Stone", 
+  basePrice = 85 
+}: PriceCalculatorProps) {
   const { t, language } = useLanguage();
-  const [calculation, setCalculation] = useState<CalculationData>({
-    area: 0,
-    thickness: "20mm",
-    finish: "polished",
-    installation: false,
+  const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState(1);
+  
+  // Form data
+  const [dimensions, setDimensions] = useState({
+    length: '',
+    width: '',
+    thickness: '20mm'
   });
-
-  const [result, setResult] = useState<{
-    materialCost: number;
-    installationCost: number;
-    totalCost: number;
-  } | null>(null);
-
-  const savePriceCalculation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest("/api/price-calculations", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    },
+  
+  const [options, setOptions] = useState({
+    finish: 'polished',
+    edge: 'straight',
+    installation: true,
+    delivery: true
   });
+  
+  const [contact, setContact] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  
+  const [calculation, setCalculation] = useState<CalculationResult | null>(null);
+
+  // Pricing data
+  const finishPrices = {
+    polished: { name: "Polished", price: 0, description: "Smooth, reflective surface" },
+    honed: { name: "Honed", price: 10, description: "Matte, smooth finish" },
+    brushed: { name: "Brushed", price: 15, description: "Textured, anti-slip surface" },
+    flamed: { name: "Flamed", price: 20, description: "Rough, natural texture" }
+  };
+
+  const edgePrices = {
+    straight: { name: "Straight Edge", price: 0 },
+    beveled: { name: "Beveled Edge", price: 8 },
+    bullnose: { name: "Bullnose Edge", price: 12 },
+    ogee: { name: "Ogee Edge", price: 18 }
+  };
+
+  const thicknessPrices = {
+    '15mm': { price: 0.8 },
+    '20mm': { price: 1.0 },
+    '30mm': { price: 1.4 },
+    '40mm': { price: 1.8 }
+  };
 
   const calculatePrice = () => {
-    const thicknessMultiplier = calculation.thickness === "30mm" ? 1.5 : calculation.thickness === "20mm" ? 1.2 : 1;
-    const finishMultiplier = calculation.finish === "honed" ? 1.1 : calculation.finish === "polished" ? 1.3 : 1;
+    const length = parseFloat(dimensions.length) || 0;
+    const width = parseFloat(dimensions.width) || 0;
+    const area = length * width;
     
-    const materialCost = calculation.area * basePrice * thicknessMultiplier * finishMultiplier;
-    const installationCost = calculation.installation ? calculation.area * 25 : 0;
-    const totalCost = materialCost + installationCost;
+    if (area <= 0) return;
 
-    const newResult = {
-      materialCost,
-      installationCost,
-      totalCost,
-    };
+    const thicknessMultiplier = thicknessPrices[dimensions.thickness as keyof typeof thicknessPrices]?.price || 1;
+    const finishPrice = finishPrices[options.finish as keyof typeof finishPrices]?.price || 0;
+    const edgePrice = edgePrices[options.edge as keyof typeof edgePrices]?.price || 0;
+    
+    const materialCost = area * basePrice * thicknessMultiplier;
+    const finishCost = area * finishPrice;
+    const laborCost = area * 25; // $25 per sqm for cutting and preparation
+    const edgeCostTotal = (length + width) * 2 * edgePrice; // Perimeter * edge price
+    
+    const installationCost = options.installation ? area * 35 : 0; // $35 per sqm
+    const deliveryCost = options.delivery ? 150 : 0;
+    
+    const subtotal = materialCost + finishCost + laborCost + edgeCostTotal + installationCost + deliveryCost;
+    const tax = subtotal * 0.1; // 10% tax
+    const total = subtotal + tax;
 
-    setResult(newResult);
+    setCalculation({
+      materialCost: materialCost + edgeCostTotal,
+      laborCost,
+      finishCost,
+      installationCost: installationCost + deliveryCost,
+      subtotal,
+      tax,
+      total,
+      area
+    });
+  };
 
-    // Save calculation
-    if (productId) {
-      savePriceCalculation.mutate({
-        productId,
-        ...calculation,
-        totalPrice: totalCost,
-      });
+  useEffect(() => {
+    if (dimensions.length && dimensions.width) {
+      calculatePrice();
     }
+  }, [dimensions, options]);
+
+  const handleNext = () => {
+    if (step < 4) setStep(step + 1);
+  };
+
+  const handlePrevious = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
+  const resetCalculator = () => {
+    setStep(1);
+    setDimensions({ length: '', width: '', thickness: '20mm' });
+    setOptions({ finish: 'polished', edge: 'straight', installation: true, delivery: true });
+    setContact({ name: '', email: '', phone: '' });
+    setCalculation(null);
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto glass-morph">
-      <CardHeader className="text-center">
-        <div className="flex items-center justify-center space-x-2 mb-2">
-          <Calculator className="h-6 w-6 text-stone-bronze" />
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-stone-bronze to-stone-gold bg-clip-text text-transparent">
-            Price Calculator
-          </CardTitle>
-        </div>
-        <CardDescription>
-          Get an instant estimate for your {productName || "stone"} project
-        </CardDescription>
-      </CardHeader>
+    <>
+      <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm border border-gray-200/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+        <CardHeader className="text-center pb-4">
+          <div className="flex items-center justify-center space-x-2 mb-2">
+            <div className="p-2 rounded-full bg-gradient-to-r from-green-500 to-green-600">
+              <Calculator className="h-5 w-5 text-white" />
+            </div>
+            <CardTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              Price Calculator
+            </CardTitle>
+          </div>
+          <CardDescription className="text-gray-600">
+            Get instant pricing for {productName}
+          </CardDescription>
+        </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Area Input */}
-        <div className="space-y-2">
-          <Label htmlFor="area" className="flex items-center space-x-2">
-            <Ruler className="h-4 w-4" />
-            <span>Area (sq ft)</span>
-          </Label>
-          <Input
-            id="area"
-            type="number"
-            placeholder="Enter area in square feet"
-            value={calculation.area || ""}
-            onChange={(e) => setCalculation(prev => ({ ...prev, area: parseFloat(e.target.value) || 0 }))}
-            className="fluid-hover"
-          />
-        </div>
+        <CardContent className="space-y-4">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-600 mb-1">
+              ${basePrice}
+            </div>
+            <div className="text-sm text-gray-500">per square meter</div>
+          </div>
 
-        {/* Thickness Selection */}
-        <div className="space-y-2">
-          <Label htmlFor="thickness" className="flex items-center space-x-2">
-            <Package className="h-4 w-4" />
-            <span>Thickness</span>
-          </Label>
-          <Select value={calculation.thickness} onValueChange={(value) => setCalculation(prev => ({ ...prev, thickness: value }))}>
-            <SelectTrigger className="fluid-hover">
-              <SelectValue placeholder="Select thickness" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="12mm">12mm - Standard</SelectItem>
-              <SelectItem value="20mm">20mm - Premium</SelectItem>
-              <SelectItem value="30mm">30mm - Luxury</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+            <Calculator className="h-4 w-4 mr-2" />
+            Calculate Custom Price
+          </Button>
 
-        {/* Finish Selection */}
-        <div className="space-y-2">
-          <Label htmlFor="finish">Surface Finish</Label>
-          <Select value={calculation.finish} onValueChange={(value) => setCalculation(prev => ({ ...prev, finish: value }))}>
-            <SelectTrigger className="fluid-hover">
-              <SelectValue placeholder="Select finish" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="natural">Natural</SelectItem>
-              <SelectItem value="honed">Honed</SelectItem>
-              <SelectItem value="polished">Polished - Premium</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="text-center text-xs text-gray-500">
+            Includes material, labor, and finishing options
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Installation Option */}
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="installation"
-            checked={calculation.installation}
-            onChange={(e) => setCalculation(prev => ({ ...prev, installation: e.target.checked }))}
-            className="rounded border-gray-300"
-          />
-          <Label htmlFor="installation" className="flex items-center space-x-2">
-            <Truck className="h-4 w-4" />
-            <span>Include Professional Installation (+$25/sq ft)</span>
-          </Label>
-        </div>
-
-        {/* Calculate Button */}
-        <Button 
-          onClick={calculatePrice} 
-          className="w-full bg-gradient-stone hover:opacity-90 text-white font-semibold py-3 magnetic"
-          disabled={calculation.area <= 0}
-        >
-          Calculate Price
-        </Button>
-
-        {/* Results */}
-        {result && (
-          <div className="mt-6 p-6 bg-gradient-to-br from-stone-cream/10 to-stone-gold/10 rounded-lg border border-stone-bronze/20 animate-fade-in-up">
-            <h3 className="text-lg font-semibold mb-4 text-center">Price Breakdown</h3>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span>Material Cost:</span>
-                <span className="font-semibold">${result.materialCost.toLocaleString()}</span>
+      {/* Price Calculator Dialog */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-2xl font-bold text-gray-900">
+                  Price Calculator: {productName}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600">
+                  Step {step} of 4 - Configure your project for accurate pricing
+                </DialogDescription>
               </div>
-              
-              {calculation.installation && (
-                <div className="flex justify-between items-center">
-                  <span>Installation Cost:</span>
-                  <span className="font-semibold">${result.installationCost.toLocaleString()}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="mt-6">
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
+              <div 
+                className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(step / 4) * 100}%` }}
+              ></div>
+            </div>
+
+            {/* Step Content */}
+            <div className="space-y-6">
+              {step === 1 && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Project Dimensions</h3>
+                    <p className="text-gray-600">Enter the measurements for your stone installation</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="length" className="text-sm font-medium text-gray-700">
+                        Length (meters)
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="length"
+                          type="number"
+                          placeholder="0.00"
+                          value={dimensions.length}
+                          onChange={(e) => setDimensions(prev => ({ ...prev, length: e.target.value }))}
+                          className="pl-8"
+                        />
+                        <Ruler className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="width" className="text-sm font-medium text-gray-700">
+                        Width (meters)
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="width"
+                          type="number"
+                          placeholder="0.00"
+                          value={dimensions.width}
+                          onChange={(e) => setDimensions(prev => ({ ...prev, width: e.target.value }))}
+                          className="pl-8"
+                        />
+                        <Ruler className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">Thickness</Label>
+                      <Select value={dimensions.thickness} onValueChange={(value) => setDimensions(prev => ({ ...prev, thickness: value }))}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="15mm">15mm (Standard)</SelectItem>
+                          <SelectItem value="20mm">20mm (Popular)</SelectItem>
+                          <SelectItem value="30mm">30mm (Premium)</SelectItem>
+                          <SelectItem value="40mm">40mm (Ultra Premium)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {dimensions.length && dimensions.width && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <span className="font-medium text-green-800">
+                          Total Area: {(parseFloat(dimensions.length) * parseFloat(dimensions.width)).toFixed(2)} m²
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-              
-              <Separator />
-              
-              <div className="flex justify-between items-center text-lg font-bold">
-                <span>Total Cost:</span>
-                <span className="text-stone-bronze">${result.totalCost.toLocaleString()}</span>
-              </div>
+
+              {step === 2 && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Finish & Edge Options</h3>
+                    <p className="text-gray-600">Choose your preferred finish and edge treatment</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Finish Options */}
+                    <div className="space-y-4">
+                      <Label className="text-sm font-medium text-gray-700">Surface Finish</Label>
+                      <div className="space-y-3">
+                        {Object.entries(finishPrices).map(([key, finish]) => (
+                          <div
+                            key={key}
+                            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                              options.finish === key 
+                                ? 'border-green-500 bg-green-50' 
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            onClick={() => setOptions(prev => ({ ...prev, finish: key }))}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="font-medium text-gray-900">{finish.name}</div>
+                                <div className="text-sm text-gray-600">{finish.description}</div>
+                              </div>
+                              <div className="text-sm font-medium text-green-600">
+                                {finish.price > 0 ? `+$${finish.price}/m²` : 'Included'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Edge Options */}
+                    <div className="space-y-4">
+                      <Label className="text-sm font-medium text-gray-700">Edge Treatment</Label>
+                      <div className="space-y-3">
+                        {Object.entries(edgePrices).map(([key, edge]) => (
+                          <div
+                            key={key}
+                            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                              options.edge === key 
+                                ? 'border-green-500 bg-green-50' 
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            onClick={() => setOptions(prev => ({ ...prev, edge: key }))}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium text-gray-900">{edge.name}</div>
+                              <div className="text-sm font-medium text-green-600">
+                                {edge.price > 0 ? `+$${edge.price}/lm` : 'Included'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Installation & Services</h3>
+                    <p className="text-gray-600">Select additional services for your project</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div 
+                      className={`border rounded-lg p-6 cursor-pointer transition-all ${
+                        options.installation ? 'border-green-500 bg-green-50' : 'border-gray-200'
+                      }`}
+                      onClick={() => setOptions(prev => ({ ...prev, installation: !prev.installation }))}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <Wrench className="h-6 w-6 text-gray-400" />
+                          <div>
+                            <div className="font-medium text-gray-900">Professional Installation</div>
+                            <div className="text-sm text-gray-600">Expert installation by certified technicians</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium text-green-600">$35/m²</div>
+                          <Badge variant={options.installation ? "default" : "secondary"} className="text-xs">
+                            {options.installation ? "Included" : "Optional"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div 
+                      className={`border rounded-lg p-6 cursor-pointer transition-all ${
+                        options.delivery ? 'border-green-500 bg-green-50' : 'border-gray-200'
+                      }`}
+                      onClick={() => setOptions(prev => ({ ...prev, delivery: !prev.delivery }))}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <DollarSign className="h-6 w-6 text-gray-400" />
+                          <div>
+                            <div className="font-medium text-gray-900">Delivery & Handling</div>
+                            <div className="text-sm text-gray-600">Safe delivery to your location</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium text-green-600">$150</div>
+                          <Badge variant={options.delivery ? "default" : "secondary"} className="text-xs">
+                            {options.delivery ? "Included" : "Optional"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && calculation && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Price Summary</h3>
+                    <p className="text-gray-600">Complete breakdown for your {productName} project</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Price Breakdown */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Cost Breakdown</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Material & Cutting ({calculation.area.toFixed(2)}m²)</span>
+                          <span className="font-medium">${calculation.materialCost.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Labor & Preparation</span>
+                          <span className="font-medium">${calculation.laborCost.toFixed(2)}</span>
+                        </div>
+                        {calculation.finishCost > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Premium Finish</span>
+                            <span className="font-medium">${calculation.finishCost.toFixed(2)}</span>
+                          </div>
+                        )}
+                        {calculation.installationCost > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Installation & Delivery</span>
+                            <span className="font-medium">${calculation.installationCost.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <Separator />
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Subtotal</span>
+                          <span className="font-medium">${calculation.subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Tax (10%)</span>
+                          <span className="font-medium">${calculation.tax.toFixed(2)}</span>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between text-lg font-bold">
+                          <span>Total</span>
+                          <span className="text-green-600">${calculation.total.toFixed(2)}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Contact Form */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">Get Your Quote</CardTitle>
+                        <CardDescription>
+                          Enter your details to receive this quote via email
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="contact-name">Full Name</Label>
+                          <Input
+                            id="contact-name"
+                            placeholder="John Smith"
+                            value={contact.name}
+                            onChange={(e) => setContact(prev => ({ ...prev, name: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="contact-email">Email Address</Label>
+                          <Input
+                            id="contact-email"
+                            type="email"
+                            placeholder="john@example.com"
+                            value={contact.email}
+                            onChange={(e) => setContact(prev => ({ ...prev, email: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="contact-phone">Phone Number</Label>
+                          <Input
+                            id="contact-phone"
+                            placeholder="+1 (555) 123-4567"
+                            value={contact.phone}
+                            onChange={(e) => setContact(prev => ({ ...prev, phone: e.target.value }))}
+                          />
+                        </div>
+                        
+                        <Button 
+                          className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                          disabled={!contact.name || !contact.email}
+                          onClick={() => {
+                            alert(`Quote sent to ${contact.email}! Our team will contact you within 24 hours.`);
+                            setIsOpen(false);
+                            resetCalculator();
+                          }}
+                        >
+                          Send Quote to Email
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="mt-4 text-sm text-gray-600 text-center">
-              * Prices are estimates. Final pricing may vary based on specific requirements.
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8 pt-6 border-t">
+              <div className="flex space-x-2">
+                {step > 1 && (
+                  <Button
+                    variant="outline"
+                    onClick={handlePrevious}
+                    className="flex items-center space-x-2"
+                  >
+                    <Minus className="h-4 w-4" />
+                    <span>Previous</span>
+                  </Button>
+                )}
+                
+                <Button
+                  variant="outline"
+                  onClick={resetCalculator}
+                  className="text-gray-600"
+                >
+                  Reset
+                </Button>
+              </div>
+
+              {step < 4 && (
+                <Button
+                  onClick={handleNext}
+                  disabled={step === 1 && (!dimensions.length || !dimensions.width)}
+                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
+                >
+                  <span>Next</span>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -270,24 +270,7 @@ export default function Home() {
       <Newsletter />
       <Footer />
       <BackToTop />
-      
-      {/* Floating Live Chat Widget */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="w-80 h-96 bg-white rounded-lg shadow-2xl border border-stone-200 overflow-hidden hidden" id="chat-widget">
-          <LiveChat />
-        </div>
-        <button 
-          className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
-          onClick={() => {
-            const widget = document.getElementById('chat-widget');
-            if (widget) {
-              widget.classList.toggle('hidden');
-            }
-          }}
-        >
-          <MessageCircle className="h-6 w-6" />
-        </button>
-      </div>
+      <LiveChat />
     </div>
   );
 }
