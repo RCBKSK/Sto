@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Search, Filter, Calculator, Scan } from "lucide-react";
 import type { Product } from "@shared/schema";
+import { products, categories } from "@/data/products";
 
 export default function Products() {
   const [location] = useLocation();
@@ -23,13 +24,10 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter);
   const [sortBy, setSortBy] = useState("name");
 
-  const { data: products = [], isLoading } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
-  });
+  // Use local product data for complete product catalog
+  const allProducts = products;
 
-  const categories = ["All", "Limestone", "Marble", "Natural Stone", "Mosaic Tiles", "Cladding"];
-
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = allProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "" || selectedCategory === "All" || selectedCategory === "all" || 
@@ -109,12 +107,7 @@ export default function Products() {
       {/* Products Grid */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isLoading ? (
-            <div className="text-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-bronze mx-auto"></div>
-              <p className="mt-4 text-stone-gray">Loading products...</p>
-            </div>
-          ) : filteredProducts.length === 0 ? (
+          {filteredProducts.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-xl text-stone-gray">No products found matching your criteria.</p>
             </div>
@@ -147,10 +140,10 @@ export default function Products() {
                       <div className="text-lg font-bold text-stone-dark">
                         {product.originalPrice && (
                           <span className="line-through text-stone-gray text-sm mr-2">
-                            ${product.originalPrice}
+                            ${product.originalPrice}/sq ft
                           </span>
                         )}
-                        ${product.price}
+                        ${product.price}/sq ft
                       </div>
                       <div className="flex flex-col gap-2">
                         <Button 

@@ -7,11 +7,11 @@ import { useLanguage } from "@/contexts/language-context";
 import { useCart } from "@/contexts/cart-context";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@shared/schema";
+import { getPopularProducts } from "@/data/products";
 
 export default function PopularProducts() {
-  const { data: products = [], isLoading } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
-  });
+  // Use local popular products data
+  const products = getPopularProducts();
   const { t, language } = useLanguage();
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -24,18 +24,7 @@ export default function PopularProducts() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-bronze mx-auto"></div>
-            <p className="mt-4 text-stone-gray">{t("common.loading")}</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+
 
   return (
     <section className={`py-20 bg-gray-50 ${language === 'fa' ? 'font-vazir' : ''}`}>
