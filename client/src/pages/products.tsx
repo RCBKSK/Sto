@@ -148,13 +148,27 @@ export default function Products() {
                         )}
                         ${product.price}
                       </div>
-                      <Button 
-                        size="sm" 
-                        className="bg-stone-bronze hover:bg-orange-600 text-white"
-                        disabled={!product.inStock}
-                      >
-                        {product.inStock ? "View Details" : "Out of Stock"}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="bg-stone-bronze hover:bg-orange-600 text-white flex-1"
+                          disabled={!product.inStock}
+                        >
+                          {product.inStock ? "Details" : "Out of Stock"}
+                        </Button>
+                        {product.inStock && (
+                          <Button 
+                            asChild
+                            size="sm" 
+                            variant="outline"
+                            className="border-stone-bronze text-stone-bronze hover:bg-stone-bronze hover:text-white"
+                          >
+                            <Link href={`/demo?feature=ar-preview&product=${product.id}`}>
+                              AR View
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

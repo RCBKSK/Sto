@@ -15,7 +15,7 @@ import BackToTop from "@/components/back-to-top";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Phone, Users, Leaf, Calculator } from "lucide-react";
+import { ArrowRight, Phone, Users, Leaf, Calculator, Scan, MessageCircle, Calendar } from "lucide-react";
 import type { BlogPost } from "@shared/schema";
 
 export default function Home() {
@@ -77,6 +77,73 @@ export default function Home() {
 
       <Statistics />
 
+      {/* Advanced Tools Section */}
+      <section className="py-20 bg-gradient-to-br from-stone-dark to-stone-gray">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Advanced Tools & Features</h2>
+            <p className="text-xl text-stone-beige max-w-3xl mx-auto">
+              Experience our cutting-edge technology to visualize, calculate, and plan your stone projects
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
+              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Scan className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">AR Preview</h3>
+              <p className="text-stone-beige mb-4">Visualize stones in your space using augmented reality</p>
+              <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
+                <Link href="/demo?feature=ar-preview">Try AR View</Link>
+              </Button>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Calculator className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Price Calculator</h3>
+              <p className="text-stone-beige mb-4">Get instant pricing for your stone projects</p>
+              <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white">
+                <Link href="/demo?feature=price-calculator">Calculate Price</Link>
+              </Button>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <MessageCircle className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Live Chat</h3>
+              <p className="text-stone-beige mb-4">Get instant support from our stone experts</p>
+              <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
+                <Link href="/demo?feature=live-chat">Start Chat</Link>
+              </Button>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center hover:bg-white/20 transition-all group">
+              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Calendar className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Book Consultation</h3>
+              <p className="text-stone-beige mb-4">Schedule a meeting with our design experts</p>
+              <Button asChild className="bg-purple-500 hover:bg-purple-600 text-white">
+                <Link href="/demo?feature=appointment-booking">Book Now</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button asChild size="lg" className="bg-stone-bronze hover:bg-orange-600 text-white">
+              <Link href="/demo">
+                <ArrowRight className="mr-2 h-5 w-5" />
+                Explore All Tools
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 bg-stone-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,6 +170,9 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold text-stone-dark mb-4">Get a Custom Quote</h3>
               <p className="text-stone-gray">Unlock your dream space with a personalized quote tailored just for you.</p>
+              <Button asChild className="mt-4 bg-stone-bronze hover:bg-orange-600 text-white">
+                <Link href="/demo?feature=price-calculator">Try Price Calculator</Link>
+              </Button>
             </div>
           </div>
         </div>
