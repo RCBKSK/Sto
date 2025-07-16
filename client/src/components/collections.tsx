@@ -35,17 +35,20 @@ export default function Collections() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {collections.map((collection, index) => (
             <Link key={index} href={collection.href} className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-xl h-80 mb-4">
+              <div className="relative overflow-hidden rounded-xl h-80 mb-4 shadow-stone hover:shadow-stone-lg transition-all duration-300">
                 <img 
                   src={collection.image}
                   alt={collection.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-stone-dark/20 group-hover:bg-stone-dark/40 transition-colors"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-dark/60 via-transparent to-transparent group-hover:from-stone-dark/80 transition-all duration-300"></div>
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <h3 className="text-xl font-semibold mb-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    {collection.name}
+                  </h3>
+                  <div className="w-8 h-0.5 bg-stone-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-stone-dark group-hover:text-stone-bronze transition-colors">
-                {collection.name}
-              </h3>
             </Link>
           ))}
         </div>

@@ -32,23 +32,30 @@ export default function PopularProducts() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.slice(0, 6).map((product) => (
-            <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group">
-              <div className="relative">
+          {products.slice(0, 6).map((product, index) => (
+            <div 
+              key={product.id} 
+              className="bg-white rounded-xl overflow-hidden shadow-stone hover:shadow-stone-lg transition-all duration-300 group transform hover:-translate-y-2"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="relative overflow-hidden">
                 <img 
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 {product.isOnSale && (
-                  <Badge className="absolute top-4 left-4 bg-red-500 text-white">
+                  <Badge className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
                     Sale
                   </Badge>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-dark/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               <div className="p-6">
-                <div className="text-sm text-stone-bronze mb-2">{product.category}</div>
-                <h3 className="text-xl font-semibold text-stone-dark mb-3">{product.name}</h3>
+                <div className="text-sm text-stone-bronze mb-2 font-medium">{product.category}</div>
+                <h3 className="text-xl font-semibold text-stone-dark mb-3 group-hover:text-stone-bronze transition-colors">
+                  {product.name}
+                </h3>
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-2xl font-bold text-stone-dark">
                     {product.originalPrice && (
@@ -56,11 +63,11 @@ export default function PopularProducts() {
                         ${product.originalPrice}
                       </span>
                     )}
-                    ${product.price}
+                    <span className="text-stone-bronze">${product.price}</span>
                   </div>
                 </div>
                 <Button 
-                  className="w-full bg-stone-bronze hover:bg-orange-600 text-white"
+                  className="w-full bg-gradient-stone hover:shadow-stone-lg text-white transform hover:scale-105 transition-all duration-300"
                   asChild
                 >
                   <Link href={`/products/${product.id}`}>

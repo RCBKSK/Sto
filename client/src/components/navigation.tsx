@@ -31,13 +31,18 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-white/95 backdrop-blur-md shadow-stone sticky top-0 z-50 border-b border-stone-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <div className="font-bold text-xl text-stone-dark">
-              <span className="text-stone-bronze">Elegance</span> Stone
+        <div className="flex justify-between items-center h-18">
+          {/* Enhanced Logo */}
+          <Link href="/" className="flex-shrink-0 group">
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gradient-stone rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">E</span>
+              </div>
+              <div className="font-bold text-xl text-stone-dark group-hover:text-stone-bronze transition-colors">
+                <span className="text-stone-bronze">Elegance</span> Stone
+              </div>
             </div>
           </Link>
 
@@ -50,7 +55,7 @@ export default function Navigation() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="text-stone-dark hover:text-stone-bronze transition-colors flex items-center"
+                        className="text-stone-dark hover:text-stone-bronze hover:bg-stone-beige/50 transition-all duration-200 flex items-center"
                       >
                         {item.name} <ChevronDown className="ml-1 h-4 w-4" />
                       </Button>
@@ -76,14 +81,24 @@ export default function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`text-stone-dark hover:text-stone-bronze transition-colors ${
-                    location === item.href ? "text-stone-bronze" : ""
+                  className={`text-stone-dark hover:text-stone-bronze hover:bg-stone-beige/50 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    location === item.href ? "text-stone-bronze bg-stone-beige/30" : ""
                   }`}
                 >
                   {item.name}
                 </Link>
               );
             })}
+          </div>
+
+          {/* Contact Button */}
+          <div className="hidden md:block">
+            <Button 
+              asChild
+              className="bg-gradient-stone hover:shadow-stone-lg text-white transform hover:scale-105 transition-all duration-300 animate-pulse-glow"
+            >
+              <Link href="/contact">Get Quote</Link>
+            </Button>
           </div>
 
           {/* Mobile menu button */}

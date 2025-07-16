@@ -6,6 +6,12 @@ import PopularProducts from "@/components/popular-products";
 import Statistics from "@/components/statistics";
 import Team from "@/components/team";
 import Footer from "@/components/footer";
+import Features from "@/components/features";
+import Testimonials from "@/components/testimonials";
+import FAQ from "@/components/faq";
+import Newsletter from "@/components/newsletter";
+import CTASection from "@/components/cta-section";
+import BackToTop from "@/components/back-to-top";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -24,6 +30,7 @@ export default function Home() {
       <ServicesProcess />
       <Collections />
       <PopularProducts />
+      <Features />
       
       {/* Expertise Section */}
       <section className="py-20 bg-white">
@@ -134,6 +141,7 @@ export default function Home() {
       </section>
 
       <Team />
+      <Testimonials />
 
       {/* Blog Section */}
       <section className="py-20 bg-white">
@@ -172,7 +180,11 @@ export default function Home() {
         </div>
       </section>
 
+      <FAQ />
+      <CTASection />
+      <Newsletter />
       <Footer />
+      <BackToTop />
     </div>
   );
 }

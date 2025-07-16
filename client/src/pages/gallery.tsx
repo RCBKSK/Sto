@@ -150,6 +150,10 @@ export default function Gallery() {
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl">
                   <div className="relative">
+                    <div className="sr-only">
+                      <h2>Gallery Image</h2>
+                      <p>Viewing detailed image of {item.title}</p>
+                    </div>
                     <img 
                       src={item.image}
                       alt={item.title}

@@ -51,7 +51,7 @@ export class MemStorage implements IStorage {
         name: "Bianco Rhino",
         category: "Marble",
         price: "89.00",
-        originalPrice: null,
+        originalPrice: "99.00",
         description: "Premium white marble with dramatic veining patterns",
         image: "https://pixabay.com/get/g69bb38fe3d140a1de94c63eb2abe86d2729f16e1f9495342987388763858e036ff0af7a439d4891c99480babbeddfa28d19ffce1f3e1a1e4dce3d674444dcfe6_1280.jpg",
         isOnSale: true,
@@ -63,7 +63,7 @@ export class MemStorage implements IStorage {
         name: "Milano White",
         category: "Marble",
         price: "240.00",
-        originalPrice: "265.00",
+        originalPrice: null,
         description: "Clean white marble surface with subtle veining",
         image: "https://pixabay.com/get/gc97fb0e1dcb35ffb35c4f5fdfa79bc327a75fd23adb58fd2110240984a25bdb1fc33f4d6dfe6574efdbd35bd2a85c4d8f107899810a25eadd414eaf94e35f055_1280.jpg",
         isOnSale: false,
@@ -121,12 +121,19 @@ export class MemStorage implements IStorage {
     ];
 
     sampleProducts.forEach(product => {
-      this.products.set(product.id, product);
+      const productData: Product = {
+        ...product,
+        originalPrice: product.originalPrice || null,
+        isOnSale: product.isOnSale || false,
+        inStock: product.inStock || true,
+        specifications: product.specifications || null
+      };
+      this.products.set(product.id, productData);
       this.currentProductId = Math.max(this.currentProductId, product.id + 1);
     });
 
     // Sample blog posts
-    const sampleBlogPosts: (InsertBlogPost & { id: number })[] = [
+    const sampleBlogPosts: (InsertBlogPost & { id: number; publishedAt: Date })[] = [
       {
         id: 1,
         title: "The Timeless Beauty of Marble: Enhancing Your Home's Aesthetics",
@@ -160,7 +167,11 @@ export class MemStorage implements IStorage {
     ];
 
     sampleBlogPosts.forEach(post => {
-      this.blogPosts.set(post.id, post);
+      const blogPost: BlogPost = {
+        ...post,
+        publishedAt: post.publishedAt
+      };
+      this.blogPosts.set(post.id, blogPost);
       this.currentBlogId = Math.max(this.currentBlogId, post.id + 1);
     });
   }
@@ -198,7 +209,14 @@ export class MemStorage implements IStorage {
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     const id = this.currentProductId++;
-    const product: Product = { ...insertProduct, id };
+    const product: Product = {
+      ...insertProduct,
+      id,
+      originalPrice: insertProduct.originalPrice || null,
+      isOnSale: insertProduct.isOnSale || false,
+      inStock: insertProduct.inStock || true,
+      specifications: insertProduct.specifications || null
+    };
     this.products.set(id, product);
     return product;
   }
@@ -206,8 +224,10 @@ export class MemStorage implements IStorage {
   async createContactInquiry(insertInquiry: InsertContactInquiry): Promise<ContactInquiry> {
     const id = this.currentInquiryId++;
     const inquiry: ContactInquiry = { 
-      ...insertInquiry, 
-      id, 
+      ...insertInquiry,
+      id,
+      phone: insertInquiry.phone || null,
+      projectType: insertInquiry.projectType || null,
       createdAt: new Date() 
     };
     this.contactInquiries.set(id, inquiry);
