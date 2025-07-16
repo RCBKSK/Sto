@@ -15,6 +15,7 @@ import Blog from "@/pages/blog";
 import Contact from "@/pages/contact";
 import Cart from "@/pages/cart";
 import Checkout from "@/pages/checkout";
+import Demo from "@/pages/demo";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/demo" component={Demo} />
       <Route component={NotFound} />
     </Switch>
   );

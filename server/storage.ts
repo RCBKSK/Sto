@@ -1,23 +1,7 @@
 import { users, products, contactInquiries, blogPosts, type User, type InsertUser, type Product, type InsertProduct, type ContactInquiry, type InsertContactInquiry, type BlogPost, type InsertBlogPost } from "@shared/schema";
 
-export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  
-  getProducts(): Promise<Product[]>;
-  getProductById(id: number): Promise<Product | undefined>;
-  getProductsByCategory(category: string): Promise<Product[]>;
-  createProduct(product: InsertProduct): Promise<Product>;
-  
-  createContactInquiry(inquiry: InsertContactInquiry): Promise<ContactInquiry>;
-  getContactInquiries(): Promise<ContactInquiry[]>;
-  
-  getBlogPosts(): Promise<BlogPost[]>;
-  getBlogPostById(id: number): Promise<BlogPost | undefined>;
-  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
-  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
-}
+// Use interface from database-storage
+import { IStorage } from "./database-storage";
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
@@ -264,4 +248,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Import database storage
+import { DatabaseStorage } from "./database-storage";
+
+// Temporarily use DatabaseStorage for all environments to avoid interface conflicts
+export const storage = new DatabaseStorage();

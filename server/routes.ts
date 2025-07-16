@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContactInquirySchema } from "@shared/schema";
 import { z } from "zod";
+import { registerEnhancedRoutes } from "./routes-enhanced";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Products routes
@@ -74,6 +75,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch blog post" });
     }
   });
+
+  // Register enhanced routes
+  await registerEnhancedRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;
