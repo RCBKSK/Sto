@@ -5,15 +5,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
+import LiveChat from "@/components/live-chat";
+import AppointmentBooking from "@/components/appointment-booking";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Linkedin, MessageCircle, Calendar } from "lucide-react";
 import { insertContactInquirySchema } from "@shared/schema";
 
 const formSchema = insertContactInquirySchema.extend({
@@ -112,17 +115,34 @@ export default function Contact() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
+            {/* Contact Options */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl text-stone-dark">Send Us a Message</CardTitle>
+                <CardTitle className="text-2xl text-stone-dark">Get in Touch</CardTitle>
                 <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible.
+                  Choose how you'd like to connect with us - send a message, chat live, or book a consultation.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <Tabs defaultValue="contact" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="contact" className="flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      Contact Form
+                    </TabsTrigger>
+                    <TabsTrigger value="chat" className="flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4" />
+                      Live Chat
+                    </TabsTrigger>
+                    <TabsTrigger value="appointment" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Book Meeting
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="contact" className="space-y-4">
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -223,15 +243,25 @@ export default function Contact() {
                       )}
                     />
                     
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-stone-bronze hover:bg-orange-600 text-white"
-                      disabled={mutation.isPending}
-                    >
-                      {mutation.isPending ? "Sending..." : "Send Message"}
-                    </Button>
-                  </form>
-                </Form>
+                        <Button 
+                          type="submit" 
+                          className="w-full bg-stone-bronze hover:bg-orange-600 text-white"
+                          disabled={mutation.isPending}
+                        >
+                          {mutation.isPending ? "Sending..." : "Send Message"}
+                        </Button>
+                      </form>
+                    </Form>
+                  </TabsContent>
+                  
+                  <TabsContent value="chat" className="space-y-4">
+                    <LiveChat />
+                  </TabsContent>
+                  
+                  <TabsContent value="appointment" className="space-y-4">
+                    <AppointmentBooking />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
 

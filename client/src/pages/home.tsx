@@ -12,6 +12,7 @@ import FAQ from "@/components/faq";
 import Newsletter from "@/components/newsletter";
 import EnhancedCTA from "@/components/enhanced-cta";
 import BackToTop from "@/components/back-to-top";
+import LiveChat from "@/components/live-chat";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -95,7 +96,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-white mb-3">AR Preview</h3>
               <p className="text-stone-beige mb-4">Visualize stones in your space using augmented reality</p>
               <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-                <Link href="/demo?feature=ar-preview">Try AR View</Link>
+                <Link href="/products">View Products</Link>
               </Button>
             </div>
 
@@ -106,7 +107,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-white mb-3">Price Calculator</h3>
               <p className="text-stone-beige mb-4">Get instant pricing for your stone projects</p>
               <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white">
-                <Link href="/demo?feature=price-calculator">Calculate Price</Link>
+                <Link href="/products">Calculate Price</Link>
               </Button>
             </div>
 
@@ -117,7 +118,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-white mb-3">Live Chat</h3>
               <p className="text-stone-beige mb-4">Get instant support from our stone experts</p>
               <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-                <Link href="/demo?feature=live-chat">Start Chat</Link>
+                <Link href="/contact">Start Chat</Link>
               </Button>
             </div>
 
@@ -128,16 +129,16 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-white mb-3">Book Consultation</h3>
               <p className="text-stone-beige mb-4">Schedule a meeting with our design experts</p>
               <Button asChild className="bg-purple-500 hover:bg-purple-600 text-white">
-                <Link href="/demo?feature=appointment-booking">Book Now</Link>
+                <Link href="/contact">Book Now</Link>
               </Button>
             </div>
           </div>
 
           <div className="text-center mt-12">
             <Button asChild size="lg" className="bg-stone-bronze hover:bg-orange-600 text-white">
-              <Link href="/demo">
+              <Link href="/products">
                 <ArrowRight className="mr-2 h-5 w-5" />
-                Explore All Tools
+                View All Products
               </Link>
             </Button>
           </div>
@@ -171,7 +172,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-stone-dark mb-4">Get a Custom Quote</h3>
               <p className="text-stone-gray">Unlock your dream space with a personalized quote tailored just for you.</p>
               <Button asChild className="mt-4 bg-stone-bronze hover:bg-orange-600 text-white">
-                <Link href="/demo?feature=price-calculator">Try Price Calculator</Link>
+                <Link href="/products">Try Price Calculator</Link>
               </Button>
             </div>
           </div>
@@ -255,6 +256,24 @@ export default function Home() {
       <Newsletter />
       <Footer />
       <BackToTop />
+      
+      {/* Floating Live Chat Widget */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <div className="w-80 h-96 bg-white rounded-lg shadow-2xl border border-stone-200 overflow-hidden hidden" id="chat-widget">
+          <LiveChat />
+        </div>
+        <button 
+          className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
+          onClick={() => {
+            const widget = document.getElementById('chat-widget');
+            if (widget) {
+              widget.classList.toggle('hidden');
+            }
+          }}
+        >
+          <MessageCircle className="h-6 w-6" />
+        </button>
+      </div>
     </div>
   );
 }

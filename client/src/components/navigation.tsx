@@ -24,7 +24,6 @@ export default function Navigation() {
     { name: t("nav.gallery"), href: "/gallery" },
     { name: t("nav.about"), href: "/about" },
     { name: t("nav.blog"), href: "/blog" },
-    { name: "Tools", href: "/demo" },
     { name: t("nav.contact"), href: "/contact" },
   ];
 

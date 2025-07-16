@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
+import PriceCalculator from "@/components/price-calculator";
+import ARPreview from "@/components/ar-preview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Search, Filter, Calculator, Scan } from "lucide-react";
 import type { Product } from "@shared/schema";
 
 export default function Products() {
@@ -148,25 +151,55 @@ export default function Products() {
                         )}
                         ${product.price}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
                         <Button 
                           size="sm" 
-                          className="bg-stone-bronze hover:bg-orange-600 text-white flex-1"
+                          className="bg-stone-bronze hover:bg-orange-600 text-white"
                           disabled={!product.inStock}
                         >
-                          {product.inStock ? "Details" : "Out of Stock"}
+                          {product.inStock ? "Add to Cart" : "Out of Stock"}
                         </Button>
                         {product.inStock && (
-                          <Button 
-                            asChild
-                            size="sm" 
-                            variant="outline"
-                            className="border-stone-bronze text-stone-bronze hover:bg-stone-bronze hover:text-white"
-                          >
-                            <Link href={`/demo?feature=ar-preview&product=${product.id}`}>
-                              AR View
-                            </Link>
-                          </Button>
+                          <div className="flex gap-1">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white flex-1"
+                                >
+                                  <Scan className="h-4 w-4 mr-1" />
+                                  AR View
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl">
+                                <ARPreview 
+                                  productId={product.id} 
+                                  productName={product.name}
+                                  productImage={product.image}
+                                />
+                              </DialogContent>
+                            </Dialog>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white flex-1"
+                                >
+                                  <Calculator className="h-4 w-4 mr-1" />
+                                  Price
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl">
+                                <PriceCalculator 
+                                  productId={product.id}
+                                  productName={product.name}
+                                  basePrice={parseFloat(product.price)}
+                                />
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         )}
                       </div>
                     </div>
