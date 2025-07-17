@@ -6,6 +6,111 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").notNull().default("user"), // 'admin' or 'user'
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Admin-specific tables
+export const adminSettings = pgTable("admin_settings", {
+  id: serial("id").primaryKey(),
+  siteName: text("site_name").notNull().default("Elegance Stone"),
+  siteDescription: text("site_description"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  businessHours: text("business_hours"),
+  address: text("address"),
+  currency: text("currency").notNull().default("USD"),
+  taxRate: decimal("tax_rate", { precision: 5, scale: 2 }).default("0.00"),
+  shippingRate: decimal("shipping_rate", { precision: 10, scale: 2 }).default("0.00"),
+  freeShippingThreshold: decimal("free_shipping_threshold", { precision: 10, scale: 2 }),
+  maintenanceMode: boolean("maintenance_mode").default(false),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const discounts = pgTable("discounts", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'percentage' or 'fixed'
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  minOrderAmount: decimal("min_order_amount", { precision: 10, scale: 2 }),
+  maxUses: integer("max_uses"),
+  currentUses: integer("current_uses").default(0),
+  validFrom: timestamp("valid_from").notNull(),
+  validUntil: timestamp("valid_until").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const paymentMethods = pgTable("payment_methods", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'stripe', 'paypal', 'crypto', etc.
+  isEnabled: boolean("is_enabled").default(true),
+  config: text("config"), // JSON string for payment config
+  processingFee: decimal("processing_fee", { precision: 5, scale: 2 }).default("0.00"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  orderNumber: text("order_number").notNull().unique(),
+  customerEmail: text("customer_email").notNull(),
+  customerName: text("customer_name").notNull(),
+  customerPhone: text("customer_phone"),
+  shippingAddress: text("shipping_address").notNull(),
+  billingAddress: text("billing_address"),
+  items: text("items").notNull(), // JSON string
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default("0.00"),
+  shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).default("0.00"),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default("0.00"),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  paymentStatus: text("payment_status").notNull().default("pending"),
+  orderStatus: text("order_status").notNull().default("pending"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const pageContent = pgTable("page_content", {
+  id: serial("id").primaryKey(),
+  pageName: text("page_name").notNull().unique(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  metaDescription: text("meta_description"),
+  isPublished: boolean("is_published").default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const seoSettings = pgTable("seo_settings", {
+  id: serial("id").primaryKey(),
+  pageName: text("page_name").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
+  keywords: text("keywords"),
+  ogTitle: text("og_title"),
+  ogDescription: text("og_description"),
+  ogImage: text("og_image"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const analytics = pgTable("analytics", {
+  id: serial("id").primaryKey(),
+  page: text("page").notNull(),
+  visits: integer("visits").default(0),
+  uniqueVisitors: integer("unique_visitors").default(0),
+  date: timestamp("date").notNull(),
+});
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  type: text("type").notNull(), // 'order', 'contact', 'review', etc.
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const products = pgTable("products", {
