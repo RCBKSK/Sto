@@ -307,6 +307,49 @@ export const insertMaintenanceGuideSchema = createInsertSchema(maintenanceGuides
   createdAt: true,
 });
 
+// Admin schemas
+export const insertAdminSettingsSchema = createInsertSchema(adminSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertDiscountSchema = createInsertSchema(discounts).omit({
+  id: true,
+  createdAt: true,
+  currentUses: true,
+});
+
+export const insertPaymentMethodSchema = createInsertSchema(paymentMethods).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPageContentSchema = createInsertSchema(pageContent).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertSeoSettingsSchema = createInsertSchema(seoSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
+  id: true,
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+  isRead: true,
+});
+
 // Original types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
