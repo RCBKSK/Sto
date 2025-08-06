@@ -74,7 +74,7 @@ export default function About() {
             <EditableContent
               pageName="about"
               sectionKey="hero_title"
-              defaultContent="About Elegance Stone"
+              defaultContent="About Shafaf Sang"
               className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}
               as="h1"
               multiline={false}
@@ -82,7 +82,7 @@ export default function About() {
             <EditableContent
               pageName="about"
               sectionKey="hero_subtitle"
-              defaultContent="Crafting premium natural stone solutions with over 15 years of expertise"
+              defaultContent="Leading Iranian supplier of premium natural stone solutions from Fars Province"
               className={`text-xl text-stone-gray max-w-2xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}
               as="p"
               multiline={true}

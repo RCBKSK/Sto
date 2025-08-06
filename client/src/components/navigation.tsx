@@ -43,13 +43,13 @@ export default function Navigation() {
           <Link href="/" className="flex-shrink-0 group">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-stone rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">E</span>
+                <span className="text-white font-bold text-lg">S</span>
               </div>
               <div className="font-bold text-xl text-stone-dark group-hover:text-stone-bronze transition-colors">
                 <EditableContent
                   pageName="global"
                   sectionKey="company_name"
-                  defaultContent="Elegance Stone"
+                  defaultContent="Shafaf Sang"
                   multiline={false}
                   placeholder="Company name..."
                 />

@@ -55,7 +55,7 @@ export default function Hero() {
         <EditableContent
           pageName="home"
           sectionKey="hero_title"
-          defaultContent="Premium Natural Stone Cladding"
+          defaultContent="Shafaf Sang | Premium Iranian Stone Products"
           className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight break-words"
           as="h1"
           multiline={false}
@@ -63,7 +63,7 @@ export default function Hero() {
         <EditableContent
           pageName="home"
           sectionKey="hero_subtitle"
-          defaultContent="Transform your space with our exquisite collection of natural stones"
+          defaultContent="Premium Iranian natural stone products from Fars Province. Quality stone cladding, tiles, and design solutions."
           className="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200 max-w-4xl mx-auto leading-relaxed"
           as="p"
           multiline={true}

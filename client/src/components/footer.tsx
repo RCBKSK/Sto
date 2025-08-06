@@ -19,13 +19,13 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-10 h-10 bg-gradient-stone rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">E</span>
+                <span className="text-white font-bold text-lg">S</span>
               </div>
               <div className="font-bold text-2xl">
                 <EditableContent
                   pageName="global"
                   sectionKey="footer_company_name"
-                  defaultContent="Elegance Stone"
+                  defaultContent="Shafaf Sang"
                   className="text-stone-bronze"
                   multiline={false}
                 />
@@ -34,7 +34,7 @@ export default function Footer() {
             <EditableContent
               pageName="global"
               sectionKey="footer_description"
-              defaultContent="Premium natural stone supplier specializing in cladding, tiles, and design solutions. Quality and craftsmanship since 2010."
+              defaultContent="سنگبری شفاف سنگ - Premium Iranian stone supplier specializing in cladding, tiles, and design solutions. Located in Fars Province with quality craftsmanship."
               className="text-gray-400 mb-6 max-w-md leading-relaxed"
               as="p"
               multiline={true}

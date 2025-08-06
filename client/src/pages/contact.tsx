@@ -74,22 +74,22 @@ export default function Contact() {
     {
       icon: <MapPin className="h-6 w-6" />,
       title: "Address",
-      info: "123 Stone Avenue\nNatural Valley, NY 12345"
+      info: "Shafaf Sang\nسنگبری شفاف سنگ\nFars Province, شهرسنگ، Unnamed Road, 56QW+WRH, Iran"
     },
     {
       icon: <Phone className="h-6 w-6" />,
       title: "Phone",
-      info: "+1 (555) 123-4567"
+      info: "+989177322540"
     },
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email",
-      info: "info@elegancestone.com"
+      info: "Info@shafafsang.ir"
     },
     {
       icon: <Clock className="h-6 w-6" />,
       title: "Business Hours",
-      info: "Mon - Fri: 8:00 AM - 6:00 PM\nSat: 9:00 AM - 4:00 PM\nSun: Closed"
+      info: "Sat - Thu: 8:00 AM - 6:00 PM\nFri: 9:00 AM - 12:00 PM\nHolidays: Closed"
     }
   ];
 
