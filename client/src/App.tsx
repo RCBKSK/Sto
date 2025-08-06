@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/language-context";
 import { CartProvider } from "@/contexts/cart-context";
+import { CMSProvider } from "@/contexts/cms-context";
+import { AdminToolbar, AdminLogin } from "@/components/cms/admin-toolbar";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Products from "@/pages/products";
@@ -42,10 +44,15 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <CMSProvider>
+            <TooltipProvider>
+              <Toaster />
+              <AdminLogin>
+                <AdminToolbar />
+                <Router />
+              </AdminLogin>
+            </TooltipProvider>
+          </CMSProvider>
         </CartProvider>
       </LanguageProvider>
     </QueryClientProvider>

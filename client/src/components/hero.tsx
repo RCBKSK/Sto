@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ArrowRight, Phone, ShoppingCart } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useCart } from "@/contexts/cart-context";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Hero() {
   const { t, language } = useLanguage();
@@ -51,14 +52,22 @@ export default function Hero() {
             {t("hero.badge")}
           </span>
         </div>
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight break-words">
-          {t("hero.title1")} <span className="text-stone-gold bg-gradient-to-r from-stone-gold to-stone-cream bg-clip-text text-transparent">{t("hero.title2")}</span>
-          <br />
-          {t("hero.title3")}
-        </h1>
-        <p className="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200 max-w-4xl mx-auto leading-relaxed">
-          {t("hero.description")}
-        </p>
+        <EditableContent
+          pageName="home"
+          sectionKey="hero_title"
+          defaultContent="Premium Natural Stone Cladding"
+          className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight break-words"
+          as="h1"
+          multiline={false}
+        />
+        <EditableContent
+          pageName="home"
+          sectionKey="hero_subtitle"
+          defaultContent="Transform your space with our exquisite collection of natural stones"
+          className="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200 max-w-4xl mx-auto leading-relaxed"
+          as="p"
+          multiline={true}
+        />
         
         {/* Trust indicators */}
         <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 text-sm text-stone-cream/80">

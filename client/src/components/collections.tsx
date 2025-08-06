@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/language-context";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Collections() {
   const { t, language } = useLanguage();
@@ -55,12 +56,22 @@ export default function Collections() {
           <div className="inline-block px-4 py-2 bg-stone-bronze/10 rounded-full mb-4">
             <span className="text-stone-bronze font-semibold text-sm uppercase tracking-wide">Premium Collections</span>
           </div>
-          <h2 className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}>
-            {t("collections.title")}
-          </h2>
-          <p className={`text-xl text-stone-gray max-w-3xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}>
-            {t("collections.subtitle")}
-          </p>
+          <EditableContent
+            pageName="home"
+            sectionKey="collections_title"
+            defaultContent="Our Stone Collections"
+            className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}
+            as="h2"
+            multiline={false}
+          />
+          <EditableContent
+            pageName="home"
+            sectionKey="collections_subtitle"
+            defaultContent="Discover our curated selection of premium natural stones"
+            className={`text-xl text-stone-gray max-w-3xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}
+            as="p"
+            multiline={true}
+          />
         </div>
 
         {/* Featured Grid Layout */}
