@@ -78,25 +78,43 @@ export default function AdminContent() {
   const languages = ['en', 'fa'];
 
   // Fetch page contents
-  const { data: pageContents, isLoading: pageContentsLoading } = useQuery<PageContent[]>({
-    queryKey: ['/api/admin/page-content', { page: selectedPage, language: selectedLanguage }],
-    queryFn: () => apiRequest(`/api/admin/page-content?page=${selectedPage}&language=${selectedLanguage}`),
+  const { data: pageContents = [], isLoading: pageContentsLoading } = useQuery<PageContent[]>({
+    queryKey: ['/api/admin/page-content', selectedPage, selectedLanguage],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/page-content?page=${selectedPage}&language=${selectedLanguage}`);
+      if (!response.ok) throw new Error('Failed to fetch page contents');
+      return await response.json();
+    },
   });
 
   // Fetch website settings
-  const { data: websiteSettings, isLoading: settingsLoading } = useQuery<WebsiteSetting[]>({
+  const { data: websiteSettings = [], isLoading: settingsLoading } = useQuery<WebsiteSetting[]>({
     queryKey: ['/api/admin/website-settings'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/website-settings');
+      if (!response.ok) throw new Error('Failed to fetch website settings');
+      return await response.json();
+    },
   });
 
   // Fetch SEO settings
-  const { data: seoSettings, isLoading: seoLoading } = useQuery<SeoSetting[]>({
-    queryKey: ['/api/admin/seo-settings', { language: selectedLanguage }],
-    queryFn: () => apiRequest(`/api/admin/seo-settings?language=${selectedLanguage}`),
+  const { data: seoSettings = [], isLoading: seoLoading } = useQuery<SeoSetting[]>({
+    queryKey: ['/api/admin/seo-settings', selectedLanguage],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/seo-settings?language=${selectedLanguage}`);
+      if (!response.ok) throw new Error('Failed to fetch SEO settings');
+      return await response.json();
+    },
   });
 
   // Fetch media files
-  const { data: mediaFiles, isLoading: mediaLoading } = useQuery<MediaFile[]>({
+  const { data: mediaFiles = [], isLoading: mediaLoading } = useQuery<MediaFile[]>({
     queryKey: ['/api/admin/media'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/media');
+      if (!response.ok) throw new Error('Failed to fetch media files');
+      return await response.json();
+    },
   });
 
   // Page content mutations
@@ -353,7 +371,7 @@ export default function AdminContent() {
                 ))}
               </div>
             ) : (
-              pageContents?.map((content) => (
+              pageContents.map((content: PageContent) => (
                 <Card key={content.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -488,7 +506,7 @@ export default function AdminContent() {
                 ))}
               </div>
             ) : (
-              (seoSettings || [])?.map((seo) => (
+              seoSettings.map((seo: SeoSetting) => (
                 <Card key={seo.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -683,7 +701,7 @@ export default function AdminContent() {
 }
 
 // Page Content Form Component
-function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent; onSubmit: any }) {
   const availablePages = ['home', 'about', 'products', 'services', 'gallery', 'blog', 'contact'];
   const contentTypes = ['text', 'html', 'image', 'json'];
   const languages = ['en', 'fa'];
@@ -805,7 +823,7 @@ function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent;
 }
 
 // Website Setting Form Component
-function WebsiteSettingForm({ initialData, onSubmit }: { initialData?: WebsiteSetting; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+function WebsiteSettingForm({ initialData, onSubmit }: { initialData?: WebsiteSetting; onSubmit: any }) {
   const [formData, setFormData] = useState({
     settingKey: initialData?.settingKey || '',
     settingValue: initialData?.settingValue ? JSON.stringify(initialData.settingValue, null, 2) : '',
@@ -878,7 +896,7 @@ function WebsiteSettingForm({ initialData, onSubmit }: { initialData?: WebsiteSe
 }
 
 // SEO Form Component (same as before but with language support)
-function SeoForm({ initialData, onSubmit }: { initialData?: SeoSetting; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+function SeoForm({ initialData, onSubmit }: { initialData?: SeoSetting; onSubmit: any }) {
   const availablePages = ['home', 'about', 'products', 'services', 'gallery', 'blog', 'contact'];
 
   const [formData, setFormData] = useState({
@@ -1000,7 +1018,7 @@ function SeoForm({ initialData, onSubmit }: { initialData?: SeoSetting; onSubmit
 }
 
 // Media Form Component
-function MediaForm({ initialData, onSubmit }: { initialData?: MediaFile; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+function MediaForm({ initialData, onSubmit }: { initialData?: MediaFile; onSubmit: any }) {
   const [formData, setFormData] = useState({
     filename: initialData?.filename || '',
     originalName: initialData?.originalName || '',
