@@ -135,9 +135,10 @@ export function registerAdminRoutes(app: Express) {
   // Content management endpoints
   app.get('/api/admin/page-content', async (req, res) => {
     try {
-      const content = [];
+      const content = await storage.getPageContent();
       res.json(content);
     } catch (error) {
+      console.error('Error fetching page content:', error);
       res.status(500).json({ message: 'Failed to fetch page content' });
     }
   });
@@ -145,9 +146,10 @@ export function registerAdminRoutes(app: Express) {
   app.post('/api/admin/page-content', async (req, res) => {
     try {
       const contentData = req.body;
-      // Mock create
-      res.json({ id: 1, ...contentData, updatedAt: new Date().toISOString() });
+      const result = await storage.createPageContent(contentData);
+      res.json(result);
     } catch (error) {
+      console.error('Error creating page content:', error);
       res.status(500).json({ message: 'Failed to create page content' });
     }
   });
@@ -156,9 +158,10 @@ export function registerAdminRoutes(app: Express) {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      // Mock update
-      res.json({ message: 'Page content updated successfully' });
+      const result = await storage.updatePageContent(parseInt(id), updateData);
+      res.json(result);
     } catch (error) {
+      console.error('Error updating page content:', error);
       res.status(500).json({ message: 'Failed to update page content' });
     }
   });
@@ -166,9 +169,10 @@ export function registerAdminRoutes(app: Express) {
   // SEO settings endpoints
   app.get('/api/admin/seo-settings', async (req, res) => {
     try {
-      const seoSettings = [];
+      const seoSettings = await storage.getSeoSettings();
       res.json(seoSettings);
     } catch (error) {
+      console.error('Error fetching SEO settings:', error);
       res.status(500).json({ message: 'Failed to fetch SEO settings' });
     }
   });
@@ -176,9 +180,10 @@ export function registerAdminRoutes(app: Express) {
   app.post('/api/admin/seo-settings', async (req, res) => {
     try {
       const seoData = req.body;
-      // Mock create
-      res.json({ id: 1, ...seoData, updatedAt: new Date().toISOString() });
+      const result = await storage.createSeoSettings(seoData);
+      res.json(result);
     } catch (error) {
+      console.error('Error creating SEO settings:', error);
       res.status(500).json({ message: 'Failed to create SEO settings' });
     }
   });
@@ -187,9 +192,10 @@ export function registerAdminRoutes(app: Express) {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      // Mock update
-      res.json({ message: 'SEO settings updated successfully' });
+      const result = await storage.updateSeoSettings(parseInt(id), updateData);
+      res.json(result);
     } catch (error) {
+      console.error('Error updating SEO settings:', error);
       res.status(500).json({ message: 'Failed to update SEO settings' });
     }
   });

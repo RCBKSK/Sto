@@ -77,6 +77,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/blog", async (req, res) => {
+    try {
+      const postData = req.body;
+      const post = await storage.createBlogPost(postData);
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create blog post" });
+    }
+  });
+
+  app.put("/api/blog/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = req.body;
+      const post = await storage.updateBlogPost(id, updateData);
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update blog post" });
+    }
+  });
+
   // Register enhanced routes
   await registerEnhancedRoutes(app);
 

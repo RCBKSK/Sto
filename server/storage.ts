@@ -22,7 +22,7 @@ export class MemStorage implements IStorage {
     this.currentProductId = 1;
     this.currentInquiryId = 1;
     this.currentBlogId = 1;
-    
+
     // Initialize with sample data
     this.initializeData();
   }
@@ -241,6 +241,7 @@ export class MemStorage implements IStorage {
     );
   }
 
+  // Updated createBlogPost to use Map for storage
   async createBlogPost(insertPost: InsertBlogPost): Promise<BlogPost> {
     const id = this.currentBlogId++;
     const post: BlogPost = { 
@@ -302,35 +303,113 @@ export class MemStorage implements IStorage {
   }
 
   async removeFromWishlist(userId: number, productId: number): Promise<void> {
-    // No-op for memory storage
+    const wishlistItems = await this.getWishlistByUserId(userId);
+    const filtered = wishlistItems.filter(item => item.productId !== productId);
+    this.data.wishlist = this.data.wishlist.filter(item => !(item.userId === userId && item.productId === productId));
+    await this.saveData();
   }
 
-  async createPriceCalculation(calculation: any): Promise<any> {
-    return { id: 1, ...calculation, createdAt: new Date() };
+  // Page Content Management
+  async getPageContent(): Promise<any[]> {
+    return this.data.pageContent || [];
   }
 
-  async getPriceCalculations(): Promise<any[]> {
-    return [];
+  async createPageContent(contentData: any): Promise<any> {
+    if (!this.data.pageContent) {
+      this.data.pageContent = [];
+    }
+    const newContent = {
+      id: Date.now(),
+      ...contentData,
+      updatedAt: new Date().toISOString()
+    };
+    this.data.pageContent.push(newContent);
+    await this.saveData();
+    return newContent;
   }
 
-  async createChatMessage(message: any): Promise<any> {
-    return { id: 1, ...message, timestamp: new Date() };
+  async updatePageContent(id: number, updateData: any): Promise<any> {
+    if (!this.data.pageContent) {
+      this.data.pageContent = [];
+    }
+    const index = this.data.pageContent.findIndex(content => content.id === id);
+    if (index === -1) {
+      throw new Error('Page content not found');
+    }
+    this.data.pageContent[index] = {
+      ...this.data.pageContent[index],
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    await this.saveData();
+    return this.data.pageContent[index];
   }
 
-  async getChatMessages(sessionId: string): Promise<any[]> {
-    return [];
+  // SEO Settings Management
+  async getSeoSettings(): Promise<any[]> {
+    return this.data.seoSettings || [];
   }
 
-  async createMaintenanceGuide(guide: any): Promise<any> {
-    return { id: 1, ...guide, createdAt: new Date() };
+  async createSeoSettings(seoData: any): Promise<any> {
+    if (!this.data.seoSettings) {
+      this.data.seoSettings = [];
+    }
+    const newSeoSettings = {
+      id: Date.now(),
+      ...seoData,
+      updatedAt: new Date().toISOString()
+    };
+    this.data.seoSettings.push(newSeoSettings);
+    await this.saveData();
+    return newSeoSettings;
   }
 
-  async getMaintenanceGuides(): Promise<any[]> {
-    return [];
+  async updateSeoSettings(id: number, updateData: any): Promise<any> {
+    if (!this.data.seoSettings) {
+      this.data.seoSettings = [];
+    }
+    const index = this.data.seoSettings.findIndex(settings => settings.id === id);
+    if (index === -1) {
+      throw new Error('SEO settings not found');
+    }
+    this.data.seoSettings[index] = {
+      ...this.data.seoSettings[index],
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    await this.saveData();
+    return this.data.seoSettings[index];
   }
 
-  async getMaintenanceGuidesByStoneType(stoneType: string): Promise<any[]> {
-    return [];
+  // Blog Post Management
+  async createBlogPost(postData: any): Promise<any> {
+    if (!this.data.blogPosts) {
+      this.data.blogPosts = [];
+    }
+    const newPost = {
+      id: Date.now(),
+      ...postData,
+      publishedAt: postData.publishedAt || new Date().toISOString()
+    };
+    this.data.blogPosts.push(newPost);
+    await this.saveData();
+    return newPost;
+  }
+
+  async updateBlogPost(id: number, updateData: any): Promise<any> {
+    if (!this.data.blogPosts) {
+      this.data.blogPosts = [];
+    }
+    const index = this.data.blogPosts.findIndex(post => post.id === id);
+    if (index === -1) {
+      throw new Error('Blog post not found');
+    }
+    this.data.blogPosts[index] = {
+      ...this.data.blogPosts[index],
+      ...updateData
+    };
+    await this.saveData();
+    return this.data.blogPosts[index];
   }
 }
 
