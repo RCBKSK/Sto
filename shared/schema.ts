@@ -382,11 +382,6 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   updatedAt: true,
 });
 
-export const insertPageContentSchema = createInsertSchema(pageContent).omit({
-  id: true,
-  updatedAt: true,
-});
-
 export const insertSeoSettingsSchema = createInsertSchema(seoSettings).omit({
   id: true,
   updatedAt: true,
@@ -420,6 +415,9 @@ export type InsertWebsiteSetting = z.infer<typeof insertWebsiteSettingSchema>;
 
 export type MediaFile = typeof mediaLibrary.$inferSelect;
 export type InsertMediaFile = z.infer<typeof insertMediaFileSchema>;
+
+export type SeoSetting = typeof seoSettings.$inferSelect;
+export type InsertSeoSetting = z.infer<typeof insertSeoSettingsSchema>;
 
 // New types
 export type Appointment = typeof appointments.$inferSelect;
