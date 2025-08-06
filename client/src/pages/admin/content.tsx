@@ -782,7 +782,7 @@ function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent;
         />
         {formData.contentType === 'json' && (
           <p className="text-xs text-muted-foreground">
-            Enter valid JSON. For images: {"url": "...", "alt": "...", "caption": "..."}
+            Enter valid JSON. For images: {`{"url": "...", "alt": "...", "caption": "..."}`}
           </p>
         )}
       </div>
