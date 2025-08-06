@@ -263,14 +263,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // SEO Settings Management
-  async getSeoSettings(language = 'en'): Promise<SeoSetting[]> {
-    return await db.select().from(seoSettings)
-      .where(eq(seoSettings.language, language));
+  async getSeoSettings(): Promise<SeoSetting[]> {
+    return await db.select().from(seoSettings);
   }
 
-  async getSeoSettingByPage(pageName: string, language = 'en'): Promise<SeoSetting | undefined> {
+  async getSeoSettingByPage(pageName: string): Promise<SeoSetting | undefined> {
     const [seo] = await db.select().from(seoSettings)
-      .where(and(eq(seoSettings.pageName, pageName), eq(seoSettings.language, language)));
+      .where(eq(seoSettings.pageName, pageName));
     return seo || undefined;
   }
 

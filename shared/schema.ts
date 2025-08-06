@@ -93,6 +93,7 @@ export const seoSettings = pgTable("seo_settings", {
   ogTitle: text("og_title"),
   ogDescription: text("og_description"),
   ogImage: text("og_image"),
+  language: text("language").notNull().default("en"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
