@@ -19,45 +19,57 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   getProducts(): Promise<Product[]>;
   getProductById(id: number): Promise<Product | undefined>;
   getProductsByCategory(category: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
-  
+
   createContactInquiry(inquiry: InsertContactInquiry): Promise<ContactInquiry>;
   getContactInquiries(): Promise<ContactInquiry[]>;
-  
+
   getBlogPosts(): Promise<BlogPost[]>;
   getBlogPostById(id: number): Promise<BlogPost | undefined>;
   getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: number, updateData: any): Promise<any>;
+
+  // Page Content Management
+  getPageContent(): Promise<any[]>;
+  createPageContent(contentData: any): Promise<any>;
+  updatePageContent(id: number, updateData: any): Promise<any>;
+
+  // SEO Settings Management
+  getSeoSettings(): Promise<any[]>;
+  createSeoSettings(seoData: any): Promise<any>;
+  updateSeoSettings(id: number, updateData: any): Promise<any>;
+
 
   // New methods for enhanced features
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   getAppointments(): Promise<Appointment[]>;
-  
+
   createQuoteRequest(request: InsertQuoteRequest): Promise<QuoteRequest>;
   getQuoteRequests(): Promise<QuoteRequest[]>;
-  
+
   createCustomerReview(review: InsertCustomerReview): Promise<CustomerReview>;
   getCustomerReviews(): Promise<CustomerReview[]>;
   getReviewsByProductId(productId: number): Promise<CustomerReview[]>;
-  
+
   createProjectGallery(project: InsertProjectGallery): Promise<ProjectGallery>;
   getProjectGallery(): Promise<ProjectGallery[]>;
   getFeaturedProjects(): Promise<ProjectGallery[]>;
-  
+
   createWishlist(wishlist: InsertWishlist): Promise<Wishlist>;
   getWishlistByUserId(userId: number): Promise<Wishlist[]>;
   removeFromWishlist(userId: number, productId: number): Promise<void>;
-  
+
   createPriceCalculation(calculation: InsertPriceCalculation): Promise<PriceCalculation>;
   getPriceCalculations(): Promise<PriceCalculation[]>;
-  
+
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getChatMessages(sessionId: string): Promise<ChatMessage[]>;
-  
+
   createMaintenanceGuide(guide: InsertMaintenanceGuide): Promise<MaintenanceGuide>;
   getMaintenanceGuides(): Promise<MaintenanceGuide[]>;
   getMaintenanceGuidesByStoneType(stoneType: string): Promise<MaintenanceGuide[]>;
@@ -128,6 +140,110 @@ export class DatabaseStorage implements IStorage {
     const [post] = await db.insert(blogPosts).values(insertPost).returning();
     return post;
   }
+
+  async updateBlogPost(id: number, updateData: any): Promise<any> {
+    const result = await db.update(blogPosts)
+      .set(updateData)
+      .where(eq(blogPosts.id, id))
+      .returning();
+
+    if (result.length === 0) {
+      throw new Error('Blog post not found');
+    }
+
+    return result[0];
+  }
+
+  // Page Content Management (stub implementations for DatabaseStorage)
+  async getPageContent(): Promise<any[]> {
+    // Return sample page content for now
+    return [
+      {
+        id: 1,
+        pageName: 'home',
+        title: 'Home Page',
+        content: '<h1>Welcome to Elegance Stone</h1><p>Premium natural stone supplier offering the finest marble, granite, and limestone.</p>',
+        metaDescription: 'Premium natural stone supplier - marble, granite, limestone',
+        isPublished: true,
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 2,
+        pageName: 'about',
+        title: 'About Us',
+        content: '<h1>About Elegance Stone</h1><p>We have been providing premium natural stone solutions for over two decades.</p>',
+        metaDescription: 'Learn about Elegance Stone - premium natural stone specialists',
+        isPublished: true,
+        updatedAt: new Date().toISOString()
+      }
+    ];
+  }
+
+  async createPageContent(contentData: any): Promise<any> {
+    const newContent = {
+      id: Date.now(), // Simple ID generation
+      ...contentData,
+      updatedAt: new Date().toISOString()
+    };
+    return newContent;
+  }
+
+  async updatePageContent(id: number, updateData: any): Promise<any> {
+    const updated = {
+      id,
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    return updated;
+  }
+
+  // SEO Settings Management (stub implementations for DatabaseStorage)
+  async getSeoSettings(): Promise<any[]> {
+    // Return sample SEO settings for now
+    return [
+      {
+        id: 1,
+        pageName: 'home',
+        title: 'Elegance Stone - Premium Natural Stone Supplier',
+        description: 'Premium natural stone supplier offering marble, granite, limestone. Professional installation and design services.',
+        keywords: 'marble, granite, limestone, natural stone, stone supplier',
+        ogTitle: 'Elegance Stone - Premium Natural Stone',
+        ogDescription: 'Transform your space with premium natural stone from Elegance Stone',
+        ogImage: 'https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?w=1200&h=630',
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 2,
+        pageName: 'products',
+        title: 'Natural Stone Products - Marble, Granite & Limestone',
+        description: 'Explore our extensive collection of premium natural stone products including marble, granite, and limestone.',
+        keywords: 'marble products, granite slabs, limestone tiles, natural stone collection',
+        ogTitle: 'Premium Natural Stone Products',
+        ogDescription: 'Discover our extensive collection of premium natural stone',
+        ogImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=630',
+        updatedAt: new Date().toISOString()
+      }
+    ];
+  }
+
+  async createSeoSettings(seoData: any): Promise<any> {
+    const newSeoSettings = {
+      id: Date.now(), // Simple ID generation
+      ...seoData,
+      updatedAt: new Date().toISOString()
+    };
+    return newSeoSettings;
+  }
+
+  async updateSeoSettings(id: number, updateData: any): Promise<any> {
+    const updated = {
+      id,
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    return updated;
+  }
+
 
   // Appointment methods
   async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
