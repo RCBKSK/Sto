@@ -15,6 +15,7 @@ import Blog from "@/pages/blog";
 import Contact from "@/pages/contact";
 import Cart from "@/pages/cart";
 import Checkout from "@/pages/checkout";
+import AdminRouter from "@/pages/admin";
 
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/admin/:rest*" component={AdminRouter} />
 
       <Route component={NotFound} />
     </Switch>

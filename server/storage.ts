@@ -172,7 +172,12 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      role: 'user',
+      createdAt: new Date() 
+    };
     this.users.set(id, user);
     return user;
   }
@@ -245,6 +250,87 @@ export class MemStorage implements IStorage {
     };
     this.blogPosts.set(id, post);
     return post;
+  }
+
+  // Enhanced features methods (stub implementations for MemStorage)
+  async createAppointment(appointment: any): Promise<any> {
+    return { id: 1, ...appointment, createdAt: new Date() };
+  }
+
+  async getAppointments(): Promise<any[]> {
+    return [];
+  }
+
+  async createQuoteRequest(request: any): Promise<any> {
+    return { id: 1, ...request, createdAt: new Date() };
+  }
+
+  async getQuoteRequests(): Promise<any[]> {
+    return [];
+  }
+
+  async createCustomerReview(review: any): Promise<any> {
+    return { id: 1, ...review, createdAt: new Date() };
+  }
+
+  async getCustomerReviews(): Promise<any[]> {
+    return [];
+  }
+
+  async getReviewsByProductId(productId: number): Promise<any[]> {
+    return [];
+  }
+
+  async createProjectGallery(project: any): Promise<any> {
+    return { id: 1, ...project, createdAt: new Date() };
+  }
+
+  async getProjectGallery(): Promise<any[]> {
+    return [];
+  }
+
+  async getFeaturedProjects(): Promise<any[]> {
+    return [];
+  }
+
+  async createWishlist(wishlist: any): Promise<any> {
+    return { id: 1, ...wishlist, createdAt: new Date() };
+  }
+
+  async getWishlistByUserId(userId: number): Promise<any[]> {
+    return [];
+  }
+
+  async removeFromWishlist(userId: number, productId: number): Promise<void> {
+    // No-op for memory storage
+  }
+
+  async createPriceCalculation(calculation: any): Promise<any> {
+    return { id: 1, ...calculation, createdAt: new Date() };
+  }
+
+  async getPriceCalculations(): Promise<any[]> {
+    return [];
+  }
+
+  async createChatMessage(message: any): Promise<any> {
+    return { id: 1, ...message, timestamp: new Date() };
+  }
+
+  async getChatMessages(sessionId: string): Promise<any[]> {
+    return [];
+  }
+
+  async createMaintenanceGuide(guide: any): Promise<any> {
+    return { id: 1, ...guide, createdAt: new Date() };
+  }
+
+  async getMaintenanceGuides(): Promise<any[]> {
+    return [];
+  }
+
+  async getMaintenanceGuidesByStoneType(stoneType: string): Promise<any[]> {
+    return [];
   }
 }
 

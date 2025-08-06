@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertContactInquirySchema } from "@shared/schema";
 import { z } from "zod";
 import { registerEnhancedRoutes } from "./routes-enhanced";
+import { registerAdminRoutes } from "./admin-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Products routes
@@ -78,6 +79,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register enhanced routes
   await registerEnhancedRoutes(app);
+
+  // Register admin routes
+  registerAdminRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;
