@@ -263,7 +263,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   // SEO Settings Management
-  async getSeoSettings(): Promise<SeoSetting[]> {
+  async getSeoSettings(language?: string): Promise<SeoSetting[]> {
+    if (language) {
+      return await db.select().from(seoSettings)
+        .where(eq(seoSettings.language, language));
+    }
     return await db.select().from(seoSettings);
   }
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -403,10 +402,10 @@ export default function AdminContent() {
                         }} />
                       )}
                       {content.contentType === 'image' && (
-                        <img 
-                          src={typeof content.content === 'object' && content.content.url ? content.content.url : content.content} 
-                          alt="Content preview" 
-                          className="w-32 h-24 object-cover rounded" 
+                        <img
+                          src={typeof content.content === 'object' && content.content.url ? content.content.url : content.content}
+                          alt="Content preview"
+                          className="w-32 h-24 object-cover rounded"
                         />
                       )}
                       {content.contentType === 'json' && (
@@ -489,7 +488,7 @@ export default function AdminContent() {
                 ))}
               </div>
             ) : (
-              seoSettings?.map((seo) => (
+              (seoSettings || [])?.map((seo) => (
                 <Card key={seo.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -700,7 +699,7 @@ function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     let processedContent = formData.content;
     if (formData.contentType === 'json' && typeof formData.content === 'string') {
       try {
@@ -815,7 +814,7 @@ function WebsiteSettingForm({ initialData, onSubmit }: { initialData?: WebsiteSe
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     let processedValue;
     try {
       processedValue = JSON.parse(formData.settingValue);
@@ -881,7 +880,7 @@ function WebsiteSettingForm({ initialData, onSubmit }: { initialData?: WebsiteSe
 // SEO Form Component (same as before but with language support)
 function SeoForm({ initialData, onSubmit }: { initialData?: SeoSetting; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
   const availablePages = ['home', 'about', 'products', 'services', 'gallery', 'blog', 'contact'];
-  
+
   const [formData, setFormData] = useState({
     pageName: initialData?.pageName || 'home',
     title: initialData?.title || '',

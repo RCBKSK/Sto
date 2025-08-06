@@ -1,4 +1,3 @@
-
 import type { Express } from "express";
 import { storage } from "./storage";
 
@@ -34,7 +33,7 @@ export function registerAdminRoutes(app: Express) {
     try {
       const { page, language } = req.query;
       const content = await storage.getPageContents(
-        page as string, 
+        page as string,
         (language as string) || 'en'
       );
       res.json(content);
@@ -49,8 +48,8 @@ export function registerAdminRoutes(app: Express) {
       const { pageName, sectionKey } = req.params;
       const { language } = req.query;
       const content = await storage.getPageContentBySection(
-        pageName, 
-        sectionKey, 
+        pageName,
+        sectionKey,
         (language as string) || 'en'
       );
       res.json(content);
@@ -143,8 +142,8 @@ export function registerAdminRoutes(app: Express) {
   app.get('/api/admin/seo-settings', async (req, res) => {
     try {
       const { language } = req.query;
-      const seoSettings = await storage.getSeoSettings((language as string) || 'en');
-      res.json(seoSettings);
+      const seoSettings = await storage.getSeoSettings(language as string);
+      res.json(seoSettings || []);
     } catch (error) {
       console.error('Error fetching SEO settings:', error);
       res.status(500).json({ message: 'Failed to fetch SEO settings' });
@@ -156,7 +155,7 @@ export function registerAdminRoutes(app: Express) {
       const { pageName } = req.params;
       const { language } = req.query;
       const seoSetting = await storage.getSeoSettingByPage(
-        pageName, 
+        pageName,
         (language as string) || 'en'
       );
       res.json(seoSetting);
