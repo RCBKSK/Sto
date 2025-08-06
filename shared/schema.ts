@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, decimal, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, decimal, timestamp, jsonb, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -148,6 +148,43 @@ export const blogPosts = pgTable("blog_posts", {
   publishedAt: timestamp("published_at").defaultNow(),
 });
 
+export const pageContents = pgTable("page_contents", {
+  id: serial("id").primaryKey(),
+  pageName: text("page_name").notNull(),
+  sectionKey: text("section_key").notNull(),
+  sectionType: text("section_type").notNull(), // 'text', 'image', 'html', etc.
+  title: text("title"),
+  content: text("content").notNull(),
+  mediaUrl: text("media_url"),
+  language: text("language").notNull().default("en"),
+  isPublished: boolean("is_published").default(true),
+  sortOrder: integer("sort_order").default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const websiteSettings = pgTable("website_settings", {
+  id: serial("id").primaryKey(),
+  settingKey: text("setting_key").notNull().unique(),
+  settingValue: text("setting_value").notNull(),
+  settingType: text("setting_type").notNull().default("text"), // 'text', 'number', 'boolean', 'json'
+  category: text("category").notNull().default("general"),
+  description: text("description"),
+  isPublic: boolean("is_public").default(false),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const mediaLibrary = pgTable("media_library", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  originalName: text("original_name").notNull(),
+  url: text("url").notNull(),
+  fileType: text("file_type").notNull(),
+  fileSize: integer("file_size").notNull(),
+  alt: text("alt"),
+  description: text("description"),
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -165,6 +202,21 @@ export const insertContactInquirySchema = createInsertSchema(contactInquiries).o
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
   publishedAt: true,
+});
+
+export const insertPageContentSchema = createInsertSchema(pageContents).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertWebsiteSettingSchema = createInsertSchema(websiteSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertMediaFileSchema = createInsertSchema(mediaLibrary).omit({
+  id: true,
+  uploadedAt: true,
 });
 
 // Enhanced schemas for new features
@@ -359,6 +411,15 @@ export type ContactInquiry = typeof contactInquiries.$inferSelect;
 export type InsertContactInquiry = z.infer<typeof insertContactInquirySchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+
+export type PageContent = typeof pageContents.$inferSelect;
+export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
+
+export type WebsiteSetting = typeof websiteSettings.$inferSelect;
+export type InsertWebsiteSetting = z.infer<typeof insertWebsiteSettingSchema>;
+
+export type MediaFile = typeof mediaLibrary.$inferSelect;
+export type InsertMediaFile = z.infer<typeof insertMediaFileSchema>;
 
 // New types
 export type Appointment = typeof appointments.$inferSelect;
