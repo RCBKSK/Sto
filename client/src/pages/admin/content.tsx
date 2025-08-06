@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,19 +13,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { Plus, Edit, Trash2, Save, FileText, Globe, Settings, Image } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, FileText, Globe, Settings, Image, Layout, Type, Camera } from 'lucide-react';
 
 interface PageContent {
   id: number;
   pageName: string;
-  title: string;
-  content: string;
-  metaDescription: string | null;
+  sectionKey: string;
+  contentType: string;
+  content: any;
   isPublished: boolean;
+  language: string;
   updatedAt: string;
 }
 
-interface SeoSettings {
+interface WebsiteSetting {
+  id: number;
+  settingKey: string;
+  settingValue: any;
+  description: string;
+  updatedAt: string;
+}
+
+interface SeoSetting {
   id: number;
   pageName: string;
   title: string;
@@ -33,49 +43,65 @@ interface SeoSettings {
   ogTitle: string | null;
   ogDescription: string | null;
   ogImage: string | null;
+  language: string;
   updatedAt: string;
 }
 
-interface BlogPost {
+interface MediaFile {
   id: number;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  image: string;
-  category: string;
-  publishedAt: string | null;
+  filename: string;
+  originalName: string;
+  url: string;
+  fileType: string;
+  fileSize: number;
+  alt: string;
+  description: string;
+  uploadedAt: string;
 }
 
 export default function AdminContent() {
-  const [activeTab, setActiveTab] = useState('pages');
-  const [editingPage, setEditingPage] = useState<PageContent | null>(null);
-  const [editingSeo, setEditingSeo] = useState<SeoSettings | null>(null);
-  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  const [activeTab, setActiveTab] = useState('page-content');
+  const [selectedPage, setSelectedPage] = useState('home');
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [editingContent, setEditingContent] = useState<PageContent | null>(null);
+  const [editingSetting, setEditingSetting] = useState<WebsiteSetting | null>(null);
+  const [editingSeo, setEditingSeo] = useState<SeoSetting | null>(null);
+  const [editingMedia, setEditingMedia] = useState<MediaFile | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showSeoDialog, setShowSeoDialog] = useState(false);
-  const [showBlogDialog, setShowBlogDialog] = useState(false);
+  const [addDialogType, setAddDialogType] = useState('');
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Available pages and content types
+  const availablePages = ['home', 'about', 'products', 'services', 'gallery', 'blog', 'contact'];
+  const contentTypes = ['text', 'html', 'image', 'json'];
+  const languages = ['en', 'fa'];
+
   // Fetch page contents
-  const { data: pages, isLoading: pagesLoading } = useQuery<PageContent[]>({
-    queryKey: ['/api/admin/page-content'],
+  const { data: pageContents, isLoading: pageContentsLoading } = useQuery<PageContent[]>({
+    queryKey: ['/api/admin/page-content', { page: selectedPage, language: selectedLanguage }],
+    queryFn: () => apiRequest(`/api/admin/page-content?page=${selectedPage}&language=${selectedLanguage}`),
+  });
+
+  // Fetch website settings
+  const { data: websiteSettings, isLoading: settingsLoading } = useQuery<WebsiteSetting[]>({
+    queryKey: ['/api/admin/website-settings'],
   });
 
   // Fetch SEO settings
-  const { data: seoSettings, isLoading: seoLoading } = useQuery<SeoSettings[]>({
-    queryKey: ['/api/admin/seo-settings'],
+  const { data: seoSettings, isLoading: seoLoading } = useQuery<SeoSetting[]>({
+    queryKey: ['/api/admin/seo-settings', { language: selectedLanguage }],
+    queryFn: () => apiRequest(`/api/admin/seo-settings?language=${selectedLanguage}`),
   });
 
-  // Fetch blog posts
-  const { data: blogPosts, isLoading: blogLoading } = useQuery<BlogPost[]>({
-    queryKey: ['/api/blog'],
+  // Fetch media files
+  const { data: mediaFiles, isLoading: mediaLoading } = useQuery<MediaFile[]>({
+    queryKey: ['/api/admin/media'],
   });
 
   // Page content mutations
-  const updatePageMutation = useMutation({
+  const updatePageContentMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<PageContent> }) => {
       return await apiRequest(`/api/admin/page-content/${id}`, {
         method: 'PUT',
@@ -85,22 +111,15 @@ export default function AdminContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/page-content'] });
-      setEditingPage(null);
-      toast({
-        title: 'Success',
-        description: 'Page content updated successfully!',
-      });
+      setEditingContent(null);
+      toast({ title: 'Success', description: 'Content updated successfully!' });
     },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
-  const createPageMutation = useMutation({
+  const createPageContentMutation = useMutation({
     mutationFn: async (data: Omit<PageContent, 'id' | 'updatedAt'>) => {
       return await apiRequest('/api/admin/page-content', {
         method: 'POST',
@@ -111,23 +130,66 @@ export default function AdminContent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/page-content'] });
       setShowAddDialog(false);
-      toast({
-        title: 'Success',
-        description: 'Page created successfully!',
+      toast({ title: 'Success', description: 'Content created successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const deletePageContentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/admin/page-content/${id}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/page-content'] });
+      toast({ title: 'Success', description: 'Content deleted successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  // Website settings mutations
+  const updateWebsiteSettingMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<WebsiteSetting> }) => {
+      return await apiRequest(`/api/admin/website-settings/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
       });
     },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/website-settings'] });
+      setEditingSetting(null);
+      toast({ title: 'Success', description: 'Setting updated successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const createWebsiteSettingMutation = useMutation({
+    mutationFn: async (data: Omit<WebsiteSetting, 'id' | 'updatedAt'>) => {
+      return await apiRequest('/api/admin/website-settings', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
       });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/website-settings'] });
+      setShowAddDialog(false);
+      toast({ title: 'Success', description: 'Setting created successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
   // SEO mutations
   const updateSeoMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<SeoSettings> }) => {
+    mutationFn: async ({ id, data }: { id: number; data: Partial<SeoSetting> }) => {
       return await apiRequest(`/api/admin/seo-settings/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
@@ -137,22 +199,15 @@ export default function AdminContent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/seo-settings'] });
       setEditingSeo(null);
-      toast({
-        title: 'Success',
-        description: 'SEO settings updated successfully!',
-      });
+      toast({ title: 'Success', description: 'SEO settings updated successfully!' });
     },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
   const createSeoMutation = useMutation({
-    mutationFn: async (data: Omit<SeoSettings, 'id' | 'updatedAt'>) => {
+    mutationFn: async (data: Omit<SeoSetting, 'id' | 'updatedAt'>) => {
       return await apiRequest('/api/admin/seo-settings', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -161,164 +216,205 @@ export default function AdminContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/seo-settings'] });
-      setShowSeoDialog(false);
-      toast({
-        title: 'Success',
-        description: 'SEO settings created successfully!',
-      });
+      setShowAddDialog(false);
+      toast({ title: 'Success', description: 'SEO settings created successfully!' });
     },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
-  // Blog mutations
-  const updateBlogMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<BlogPost> }) => {
-      return await apiRequest(`/api/blog/${id}`, {
+  // Media mutations
+  const updateMediaMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<MediaFile> }) => {
+      return await apiRequest(`/api/admin/media/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
-      setEditingBlog(null);
-      toast({
-        title: 'Success',
-        description: 'Blog post updated successfully!',
-      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/media'] });
+      setEditingMedia(null);
+      toast({ title: 'Success', description: 'Media updated successfully!' });
     },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
-  const createBlogMutation = useMutation({
-    mutationFn: async (data: Omit<BlogPost, 'id' | 'publishedAt'>) => {
-      return await apiRequest('/api/blog', {
+  const createMediaMutation = useMutation({
+    mutationFn: async (data: Omit<MediaFile, 'id' | 'uploadedAt'>) => {
+      return await apiRequest('/api/admin/media', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
-      setShowBlogDialog(false);
-      toast({
-        title: 'Success',
-        description: 'Blog post created successfully!',
-      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/media'] });
+      setShowAddDialog(false);
+      toast({ title: 'Success', description: 'Media uploaded successfully!' });
     },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
+
+  const deleteMediaMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/admin/media/${id}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/media'] });
+      toast({ title: 'Success', description: 'Media deleted successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const openAddDialog = (type: string) => {
+    setAddDialogType(type);
+    setShowAddDialog(true);
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Content Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Complete Website CMS</h1>
           <p className="text-muted-foreground">
-            Manage website pages, SEO settings, and blog content
+            Edit every piece of content on your website - text, images, settings, and SEO
           </p>
+        </div>
+        <div className="flex space-x-2">
+          <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="fa">فارسی</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="pages" className="flex items-center space-x-2">
-            <FileText className="w-4 h-4" />
-            <span>Pages</span>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="page-content" className="flex items-center space-x-2">
+            <Layout className="w-4 h-4" />
+            <span>Page Content</span>
+          </TabsTrigger>
+          <TabsTrigger value="website-settings" className="flex items-center space-x-2">
+            <Settings className="w-4 h-4" />
+            <span>Website Settings</span>
           </TabsTrigger>
           <TabsTrigger value="seo" className="flex items-center space-x-2">
             <Globe className="w-4 h-4" />
             <span>SEO Settings</span>
           </TabsTrigger>
-          <TabsTrigger value="blog" className="flex items-center space-x-2">
-            <FileText className="w-4 h-4" />
-            <span>Blog Posts</span>
+          <TabsTrigger value="media" className="flex items-center space-x-2">
+            <Camera className="w-4 h-4" />
+            <span>Media Library</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Pages Tab */}
-        <TabsContent value="pages" className="space-y-6">
+        {/* Page Content Tab */}
+        <TabsContent value="page-content" className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Website Pages</h2>
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Page
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add New Page</DialogTitle>
-                  <DialogDescription>
-                    Create a new page for your website
-                  </DialogDescription>
-                </DialogHeader>
-                <PageForm onSubmit={createPageMutation} />
-              </DialogContent>
-            </Dialog>
+            <div className="flex space-x-4">
+              <div>
+                <Label htmlFor="page-select">Page</Label>
+                <Select value={selectedPage} onValueChange={setSelectedPage}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availablePages.map(page => (
+                      <SelectItem key={page} value={page}>{page.charAt(0).toUpperCase() + page.slice(1)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button onClick={() => openAddDialog('page-content')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Content Section
+            </Button>
           </div>
 
           <div className="grid gap-6">
-            {pagesLoading ? (
+            {pageContentsLoading ? (
               <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
+                {[...Array(5)].map((_, i) => (
                   <div key={i} className="h-32 bg-gray-100 animate-pulse rounded" />
                 ))}
               </div>
             ) : (
-              pages?.map((page) => (
-                <Card key={page.id}>
+              pageContents?.map((content) => (
+                <Card key={content.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center space-x-2">
-                          <span>{page.title}</span>
-                          <Badge variant={page.isPublished ? 'default' : 'secondary'}>
-                            {page.isPublished ? 'Published' : 'Draft'}
+                          <Type className="w-4 h-4" />
+                          <span>{content.sectionKey}</span>
+                          <Badge variant={content.isPublished ? 'default' : 'secondary'}>
+                            {content.isPublished ? 'Published' : 'Draft'}
                           </Badge>
+                          <Badge variant="outline">{content.contentType}</Badge>
                         </CardTitle>
                         <CardDescription>
-                          Page: {page.pageName} • Updated: {new Date(page.updatedAt).toLocaleDateString()}
+                          Page: {content.pageName} • Updated: {new Date(content.updatedAt).toLocaleDateString()}
                         </CardDescription>
                       </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => setEditingPage(page)}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setEditingContent(content)}
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deletePageContentMutation.mutate(content.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {page.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
-                    </p>
-                    {page.metaDescription && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        <strong>Meta:</strong> {page.metaDescription}
-                      </p>
-                    )}
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Content Preview:</p>
+                      {content.contentType === 'text' && (
+                        <p className="text-sm text-muted-foreground">
+                          {typeof content.content === 'string' ? content.content.substring(0, 200) + '...' : JSON.stringify(content.content).substring(0, 200) + '...'}
+                        </p>
+                      )}
+                      {content.contentType === 'html' && (
+                        <div className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{
+                          __html: typeof content.content === 'string' ? content.content.substring(0, 200) + '...' : JSON.stringify(content.content).substring(0, 200) + '...'
+                        }} />
+                      )}
+                      {content.contentType === 'image' && (
+                        <img 
+                          src={typeof content.content === 'object' && content.content.url ? content.content.url : content.content} 
+                          alt="Content preview" 
+                          className="w-32 h-24 object-cover rounded" 
+                        />
+                      )}
+                      {content.contentType === 'json' && (
+                        <pre className="text-xs bg-gray-50 p-2 rounded overflow-auto max-h-32">
+                          {JSON.stringify(content.content, null, 2)}
+                        </pre>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))
@@ -326,27 +422,63 @@ export default function AdminContent() {
           </div>
         </TabsContent>
 
-        {/* SEO Tab */}
+        {/* Website Settings Tab */}
+        <TabsContent value="website-settings" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">Website Settings</h2>
+            <Button onClick={() => openAddDialog('website-setting')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Setting
+            </Button>
+          </div>
+
+          <div className="grid gap-6">
+            {settingsLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-32 bg-gray-100 animate-pulse rounded" />
+                ))}
+              </div>
+            ) : (
+              websiteSettings?.map((setting) => (
+                <Card key={setting.id}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center space-x-2">
+                          <Settings className="w-4 h-4" />
+                          <span>{setting.settingKey}</span>
+                        </CardTitle>
+                        <CardDescription>{setting.description}</CardDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditingSetting(setting)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <pre className="text-sm bg-gray-50 p-3 rounded overflow-auto">
+                      {JSON.stringify(setting.settingValue, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        {/* SEO Settings Tab */}
         <TabsContent value="seo" className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">SEO Settings</h2>
-            <Dialog open={showSeoDialog} onOpenChange={setShowSeoDialog}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add SEO Settings
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add SEO Settings</DialogTitle>
-                  <DialogDescription>
-                    Configure SEO settings for a page
-                  </DialogDescription>
-                </DialogHeader>
-                <SeoForm onSubmit={createSeoMutation} />
-              </DialogContent>
-            </Dialog>
+            <Button onClick={() => openAddDialog('seo')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add SEO Settings
+            </Button>
           </div>
 
           <div className="grid gap-6">
@@ -362,9 +494,12 @@ export default function AdminContent() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle>{seo.title}</CardTitle>
+                        <CardTitle className="flex items-center space-x-2">
+                          <Globe className="w-4 h-4" />
+                          <span>{seo.title}</span>
+                        </CardTitle>
                         <CardDescription>
-                          Page: {seo.pageName} • Updated: {new Date(seo.updatedAt).toLocaleDateString()}
+                          Page: {seo.pageName} • Language: {seo.language} • Updated: {new Date(seo.updatedAt).toLocaleDateString()}
                         </CardDescription>
                       </div>
                       <Button
@@ -388,9 +523,10 @@ export default function AdminContent() {
                       </p>
                     )}
                     {seo.ogImage && (
-                      <p className="text-sm">
-                        <strong>OG Image:</strong> {seo.ogImage}
-                      </p>
+                      <div className="flex items-center space-x-2">
+                        <strong className="text-sm">OG Image:</strong>
+                        <img src={seo.ogImage} alt="OG Preview" className="w-16 h-12 object-cover rounded" />
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -399,73 +535,71 @@ export default function AdminContent() {
           </div>
         </TabsContent>
 
-        {/* Blog Tab */}
-        <TabsContent value="blog" className="space-y-6">
+        {/* Media Library Tab */}
+        <TabsContent value="media" className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Blog Posts</h2>
-            <Dialog open={showBlogDialog} onOpenChange={setShowBlogDialog}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Blog Post
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add Blog Post</DialogTitle>
-                  <DialogDescription>
-                    Create a new blog post
-                  </DialogDescription>
-                </DialogHeader>
-                <BlogForm onSubmit={createBlogMutation} />
-              </DialogContent>
-            </Dialog>
+            <h2 className="text-2xl font-semibold">Media Library</h2>
+            <Button onClick={() => openAddDialog('media')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Upload Media
+            </Button>
           </div>
 
-          <div className="grid gap-6">
-            {blogLoading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-32 bg-gray-100 animate-pulse rounded" />
-                ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mediaLoading ? (
+              <div className="col-span-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="h-48 bg-gray-100 animate-pulse rounded" />
+                  ))}
+                </div>
               </div>
             ) : (
-              blogPosts?.map((post) => (
-                <Card key={post.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="flex items-center space-x-2">
-                          <span>{post.title}</span>
-                          <Badge variant="outline">{post.category}</Badge>
-                        </CardTitle>
-                        <CardDescription>
-                          Slug: {post.slug} • Published: {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : 'Draft'}
-                        </CardDescription>
+              mediaFiles?.map((media) => (
+                <Card key={media.id}>
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      <div className="aspect-video bg-gray-100 rounded overflow-hidden">
+                        {media.fileType.startsWith('image/') ? (
+                          <img
+                            src={media.url}
+                            alt={media.alt || media.originalName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <FileText className="w-12 h-12 text-gray-400" />
+                          </div>
+                        )}
                       </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => setEditingBlog(post)}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex space-x-4">
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        className="w-24 h-16 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {post.excerpt}
+                      <div>
+                        <h3 className="font-medium truncate">{media.originalName}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {media.fileType} • {Math.round(media.fileSize / 1024)}KB
                         </p>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
-                        </p>
+                        {media.description && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {media.description}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingMedia(media)}
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteMediaMutation.mutate(media.id)}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Delete
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -476,30 +610,56 @@ export default function AdminContent() {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Page Dialog */}
-      <Dialog open={!!editingPage} onOpenChange={(open) => !open && setEditingPage(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      {/* Add Content Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Page</DialogTitle>
-            <DialogDescription>
-              Update page content and settings
-            </DialogDescription>
+            <DialogTitle>Add New {addDialogType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</DialogTitle>
           </DialogHeader>
-          <PageForm
-            initialData={editingPage || undefined}
-            onSubmit={(data) => editingPage && updatePageMutation.mutate({ id: editingPage.id, data })}
+          {addDialogType === 'page-content' && (
+            <PageContentForm onSubmit={createPageContentMutation} />
+          )}
+          {addDialogType === 'website-setting' && (
+            <WebsiteSettingForm onSubmit={createWebsiteSettingMutation} />
+          )}
+          {addDialogType === 'seo' && (
+            <SeoForm onSubmit={createSeoMutation} />
+          )}
+          {addDialogType === 'media' && (
+            <MediaForm onSubmit={createMediaMutation} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialogs */}
+      <Dialog open={!!editingContent} onOpenChange={(open) => !open && setEditingContent(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Page Content</DialogTitle>
+          </DialogHeader>
+          <PageContentForm
+            initialData={editingContent || undefined}
+            onSubmit={(data) => editingContent && updatePageContentMutation.mutate({ id: editingContent.id, data })}
           />
         </DialogContent>
       </Dialog>
 
-      {/* Edit SEO Dialog */}
+      <Dialog open={!!editingSetting} onOpenChange={(open) => !open && setEditingSetting(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Website Setting</DialogTitle>
+          </DialogHeader>
+          <WebsiteSettingForm
+            initialData={editingSetting || undefined}
+            onSubmit={(data) => editingSetting && updateWebsiteSettingMutation.mutate({ id: editingSetting.id, data })}
+          />
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!editingSeo} onOpenChange={(open) => !open && setEditingSeo(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit SEO Settings</DialogTitle>
-            <DialogDescription>
-              Update SEO configuration
-            </DialogDescription>
           </DialogHeader>
           <SeoForm
             initialData={editingSeo || undefined}
@@ -508,18 +668,14 @@ export default function AdminContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Blog Dialog */}
-      <Dialog open={!!editingBlog} onOpenChange={(open) => !open && setEditingBlog(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={!!editingMedia} onOpenChange={(open) => !open && setEditingMedia(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Blog Post</DialogTitle>
-            <DialogDescription>
-              Update blog post content
-            </DialogDescription>
+            <DialogTitle>Edit Media File</DialogTitle>
           </DialogHeader>
-          <BlogForm
-            initialData={editingBlog || undefined}
-            onSubmit={(data) => editingBlog && updateBlogMutation.mutate({ id: editingBlog.id, data })}
+          <MediaForm
+            initialData={editingMedia || undefined}
+            onSubmit={(data) => editingMedia && updateMediaMutation.mutate({ id: editingMedia.id, data })}
           />
         </DialogContent>
       </Dialog>
@@ -527,68 +683,108 @@ export default function AdminContent() {
   );
 }
 
-// Page Form Component
-function PageForm({ initialData, onSubmit }: { initialData?: PageContent; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+// Page Content Form Component
+function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+  const availablePages = ['home', 'about', 'products', 'services', 'gallery', 'blog', 'contact'];
+  const contentTypes = ['text', 'html', 'image', 'json'];
+  const languages = ['en', 'fa'];
+
   const [formData, setFormData] = useState({
-    pageName: initialData?.pageName || '',
-    title: initialData?.title || '',
+    pageName: initialData?.pageName || 'home',
+    sectionKey: initialData?.sectionKey || '',
+    contentType: initialData?.contentType || 'text',
     content: initialData?.content || '',
-    metaDescription: initialData?.metaDescription || '',
     isPublished: initialData?.isPublished ?? true,
+    language: initialData?.language || 'en',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit.mutate(formData);
+    
+    let processedContent = formData.content;
+    if (formData.contentType === 'json' && typeof formData.content === 'string') {
+      try {
+        processedContent = JSON.parse(formData.content);
+      } catch (e) {
+        // Keep as string if invalid JSON
+      }
+    }
+
+    onSubmit.mutate({ ...formData, content: processedContent });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="pageName">Page Name</Label>
-          <Input
-            id="pageName"
-            value={formData.pageName}
-            onChange={(e) => setFormData({ ...formData, pageName: e.target.value })}
-            placeholder="home, about, contact"
-            required
-          />
+          <Label htmlFor="pageName">Page</Label>
+          <Select value={formData.pageName} onValueChange={(value) => setFormData({ ...formData, pageName: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availablePages.map(page => (
+                <SelectItem key={page} value={page}>{page.charAt(0).toUpperCase() + page.slice(1)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="title">Page Title</Label>
+          <Label htmlFor="sectionKey">Section Key</Label>
           <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Page title"
+            id="sectionKey"
+            value={formData.sectionKey}
+            onChange={(e) => setFormData({ ...formData, sectionKey: e.target.value })}
+            placeholder="hero, about, features, etc."
             required
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="metaDescription">Meta Description</Label>
-        <Textarea
-          id="metaDescription"
-          value={formData.metaDescription}
-          onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
-          placeholder="Brief description for search engines"
-          rows={2}
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="contentType">Content Type</Label>
+          <Select value={formData.contentType} onValueChange={(value) => setFormData({ ...formData, contentType: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {contentTypes.map(type => (
+                <SelectItem key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="language">Language</Label>
+          <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="fa">فارسی</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="content">Content (HTML)</Label>
+        <Label htmlFor="content">Content</Label>
         <Textarea
           id="content"
-          value={formData.content}
+          value={typeof formData.content === 'object' ? JSON.stringify(formData.content, null, 2) : formData.content}
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          placeholder="Page content in HTML format"
-          rows={12}
-          className="font-mono text-sm"
+          placeholder={`Enter ${formData.contentType} content...`}
+          rows={formData.contentType === 'json' ? 10 : 6}
+          className={formData.contentType === 'json' ? 'font-mono text-sm' : ''}
           required
         />
+        {formData.contentType === 'json' && (
+          <p className="text-xs text-muted-foreground">
+            Enter valid JSON. For images: {"url": "...", "alt": "...", "caption": "..."}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center space-x-2">
@@ -602,23 +798,99 @@ function PageForm({ initialData, onSubmit }: { initialData?: PageContent; onSubm
 
       <DialogFooter>
         <Button type="submit" disabled={onSubmit.isPending}>
-          {onSubmit.isPending ? 'Saving...' : 'Save Page'}
+          {onSubmit.isPending ? 'Saving...' : 'Save Content'}
         </Button>
       </DialogFooter>
     </form>
   );
 }
 
-// SEO Form Component
-function SeoForm({ initialData, onSubmit }: { initialData?: SeoSettings; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+// Website Setting Form Component
+function WebsiteSettingForm({ initialData, onSubmit }: { initialData?: WebsiteSetting; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
   const [formData, setFormData] = useState({
-    pageName: initialData?.pageName || '',
+    settingKey: initialData?.settingKey || '',
+    settingValue: initialData?.settingValue ? JSON.stringify(initialData.settingValue, null, 2) : '',
+    description: initialData?.description || '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    let processedValue;
+    try {
+      processedValue = JSON.parse(formData.settingValue);
+    } catch (e) {
+      processedValue = formData.settingValue;
+    }
+
+    onSubmit.mutate({
+      settingKey: formData.settingKey,
+      settingValue: processedValue,
+      description: formData.description,
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="settingKey">Setting Key</Label>
+        <Input
+          id="settingKey"
+          value={formData.settingKey}
+          onChange={(e) => setFormData({ ...formData, settingKey: e.target.value })}
+          placeholder="site_name, contact_info, social_links, etc."
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Input
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Brief description of this setting"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="settingValue">Setting Value (JSON)</Label>
+        <Textarea
+          id="settingValue"
+          value={formData.settingValue}
+          onChange={(e) => setFormData({ ...formData, settingValue: e.target.value })}
+          placeholder='{"key": "value"} or "simple value"'
+          rows={8}
+          className="font-mono text-sm"
+          required
+        />
+        <p className="text-xs text-muted-foreground">
+          Enter JSON for complex values or simple text for strings
+        </p>
+      </div>
+
+      <DialogFooter>
+        <Button type="submit" disabled={onSubmit.isPending}>
+          {onSubmit.isPending ? 'Saving...' : 'Save Setting'}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
+// SEO Form Component (same as before but with language support)
+function SeoForm({ initialData, onSubmit }: { initialData?: SeoSetting; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+  const availablePages = ['home', 'about', 'products', 'services', 'gallery', 'blog', 'contact'];
+  
+  const [formData, setFormData] = useState({
+    pageName: initialData?.pageName || 'home',
     title: initialData?.title || '',
     description: initialData?.description || '',
     keywords: initialData?.keywords || '',
     ogTitle: initialData?.ogTitle || '',
     ogDescription: initialData?.ogDescription || '',
     ogImage: initialData?.ogImage || '',
+    language: initialData?.language || 'en',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -630,25 +902,41 @@ function SeoForm({ initialData, onSubmit }: { initialData?: SeoSettings; onSubmi
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="pageName">Page Name</Label>
-          <Input
-            id="pageName"
-            value={formData.pageName}
-            onChange={(e) => setFormData({ ...formData, pageName: e.target.value })}
-            placeholder="home, about, contact"
-            required
-          />
+          <Label htmlFor="pageName">Page</Label>
+          <Select value={formData.pageName} onValueChange={(value) => setFormData({ ...formData, pageName: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availablePages.map(page => (
+                <SelectItem key={page} value={page}>{page.charAt(0).toUpperCase() + page.slice(1)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="title">SEO Title</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="SEO optimized title"
-            required
-          />
+          <Label htmlFor="language">Language</Label>
+          <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="fa">فارسی</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="title">SEO Title</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder="SEO optimized title"
+          required
+        />
       </div>
 
       <div className="space-y-2">
@@ -712,15 +1000,16 @@ function SeoForm({ initialData, onSubmit }: { initialData?: SeoSettings; onSubmi
   );
 }
 
-// Blog Form Component
-function BlogForm({ initialData, onSubmit }: { initialData?: BlogPost; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
+// Media Form Component
+function MediaForm({ initialData, onSubmit }: { initialData?: MediaFile; onSubmit: { mutate: (data: any) => void; isPending: boolean } }) {
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    slug: initialData?.slug || '',
-    excerpt: initialData?.excerpt || '',
-    content: initialData?.content || '',
-    image: initialData?.image || '',
-    category: initialData?.category || '',
+    filename: initialData?.filename || '',
+    originalName: initialData?.originalName || '',
+    url: initialData?.url || '',
+    fileType: initialData?.fileType || '',
+    fileSize: initialData?.fileSize || 0,
+    alt: initialData?.alt || '',
+    description: initialData?.description || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -728,102 +1017,89 @@ function BlogForm({ initialData, onSubmit }: { initialData?: BlogPost; onSubmit:
     onSubmit.mutate(formData);
   };
 
-  const generateSlug = (title: string) => {
-    return title.toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="filename">Filename</Label>
           <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => {
-              const title = e.target.value;
-              setFormData({ 
-                ...formData, 
-                title,
-                slug: formData.slug || generateSlug(title)
-              });
-            }}
-            placeholder="Blog post title"
+            id="filename"
+            value={formData.filename}
+            onChange={(e) => setFormData({ ...formData, filename: e.target.value })}
+            placeholder="image-name.jpg"
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="slug">Slug</Label>
+          <Label htmlFor="originalName">Original Name</Label>
           <Input
-            id="slug"
-            value={formData.slug}
-            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            placeholder="blog-post-slug"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
-          <Select
-            value={formData.category}
-            onValueChange={(value) => setFormData({ ...formData, category: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Installation">Installation</SelectItem>
-              <SelectItem value="Remodelling">Remodelling</SelectItem>
-              <SelectItem value="3D Design">3D Design</SelectItem>
-              <SelectItem value="Maintenance">Maintenance</SelectItem>
-              <SelectItem value="Inspiration">Inspiration</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="image">Featured Image URL</Label>
-          <Input
-            id="image"
-            value={formData.image}
-            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-            placeholder="https://example.com/image.jpg"
+            id="originalName"
+            value={formData.originalName}
+            onChange={(e) => setFormData({ ...formData, originalName: e.target.value })}
+            placeholder="Original filename"
             required
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="excerpt">Excerpt</Label>
-        <Textarea
-          id="excerpt"
-          value={formData.excerpt}
-          onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-          placeholder="Brief excerpt for the blog post"
-          rows={3}
+        <Label htmlFor="url">URL</Label>
+        <Input
+          id="url"
+          value={formData.url}
+          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+          placeholder="https://example.com/image.jpg"
           required
         />
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="fileType">File Type</Label>
+          <Input
+            id="fileType"
+            value={formData.fileType}
+            onChange={(e) => setFormData({ ...formData, fileType: e.target.value })}
+            placeholder="image/jpeg, image/png, etc."
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="fileSize">File Size (bytes)</Label>
+          <Input
+            id="fileSize"
+            type="number"
+            value={formData.fileSize}
+            onChange={(e) => setFormData({ ...formData, fileSize: parseInt(e.target.value) || 0 })}
+            placeholder="1024"
+          />
+        </div>
+      </div>
+
       <div className="space-y-2">
-        <Label htmlFor="content">Content</Label>
+        <Label htmlFor="alt">Alt Text</Label>
+        <Input
+          id="alt"
+          value={formData.alt}
+          onChange={(e) => setFormData({ ...formData, alt: e.target.value })}
+          placeholder="Alternative text for accessibility"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
         <Textarea
-          id="content"
-          value={formData.content}
-          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          placeholder="Full blog post content"
-          rows={12}
-          required
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Description of the media file"
+          rows={3}
         />
       </div>
 
       <DialogFooter>
         <Button type="submit" disabled={onSubmit.isPending}>
-          {onSubmit.isPending ? 'Saving...' : 'Save Blog Post'}
+          {onSubmit.isPending ? 'Saving...' : 'Save Media'}
         </Button>
       </DialogFooter>
     </form>

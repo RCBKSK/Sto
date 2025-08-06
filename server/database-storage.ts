@@ -1,4 +1,5 @@
-import { eq } from "drizzle-orm";
+
+import { eq, and } from "drizzle-orm";
 import { db } from "./db";
 import { 
   users, type User, type InsertUser, 
@@ -12,7 +13,11 @@ import {
   wishlists, type Wishlist, type InsertWishlist,
   priceCalculations, type PriceCalculation, type InsertPriceCalculation,
   chatMessages, type ChatMessage, type InsertChatMessage,
-  maintenanceGuides, type MaintenanceGuide, type InsertMaintenanceGuide
+  maintenanceGuides, type MaintenanceGuide, type InsertMaintenanceGuide,
+  pageContents, type PageContent, type InsertPageContent,
+  websiteSettings, type WebsiteSetting, type InsertWebsiteSetting,
+  seoSettings, type SeoSetting, type InsertSeoSetting,
+  mediaLibrary, type MediaFile, type InsertMediaFile
 } from "@shared/schema";
 
 export interface IStorage {
@@ -24,6 +29,8 @@ export interface IStorage {
   getProductById(id: number): Promise<Product | undefined>;
   getProductsByCategory(category: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: number, product: Partial<Product>): Promise<Product>;
+  deleteProduct(id: number): Promise<void>;
 
   createContactInquiry(inquiry: InsertContactInquiry): Promise<ContactInquiry>;
   getContactInquiries(): Promise<ContactInquiry[]>;
@@ -32,20 +39,33 @@ export interface IStorage {
   getBlogPostById(id: number): Promise<BlogPost | undefined>;
   getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
-  updateBlogPost(id: number, updateData: any): Promise<any>;
+  updateBlogPost(id: number, updateData: Partial<BlogPost>): Promise<BlogPost>;
+  deleteBlogPost(id: number): Promise<void>;
 
-  // Page Content Management
-  getPageContent(): Promise<any[]>;
-  createPageContent(contentData: any): Promise<any>;
-  updatePageContent(id: number, updateData: any): Promise<any>;
+  // Comprehensive CMS Methods
+  getPageContents(pageName?: string, language?: string): Promise<PageContent[]>;
+  getPageContentBySection(pageName: string, sectionKey: string, language?: string): Promise<PageContent | undefined>;
+  createPageContent(contentData: InsertPageContent): Promise<PageContent>;
+  updatePageContent(id: number, updateData: Partial<PageContent>): Promise<PageContent>;
+  deletePageContent(id: number): Promise<void>;
 
-  // SEO Settings Management
-  getSeoSettings(): Promise<any[]>;
-  createSeoSettings(seoData: any): Promise<any>;
-  updateSeoSettings(id: number, updateData: any): Promise<any>;
+  getWebsiteSettings(): Promise<WebsiteSetting[]>;
+  getWebsiteSettingByKey(key: string): Promise<WebsiteSetting | undefined>;
+  createWebsiteSetting(setting: InsertWebsiteSetting): Promise<WebsiteSetting>;
+  updateWebsiteSetting(id: number, updateData: Partial<WebsiteSetting>): Promise<WebsiteSetting>;
+  
+  getSeoSettings(language?: string): Promise<SeoSetting[]>;
+  getSeoSettingByPage(pageName: string, language?: string): Promise<SeoSetting | undefined>;
+  createSeoSetting(seoData: InsertSeoSetting): Promise<SeoSetting>;
+  updateSeoSetting(id: number, updateData: Partial<SeoSetting>): Promise<SeoSetting>;
+  deleteSeoSetting(id: number): Promise<void>;
 
+  getMediaFiles(): Promise<MediaFile[]>;
+  createMediaFile(media: InsertMediaFile): Promise<MediaFile>;
+  updateMediaFile(id: number, updateData: Partial<MediaFile>): Promise<MediaFile>;
+  deleteMediaFile(id: number): Promise<void>;
 
-  // New methods for enhanced features
+  // Enhanced feature methods
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   getAppointments(): Promise<Appointment[]>;
 
@@ -111,6 +131,22 @@ export class DatabaseStorage implements IStorage {
     return product;
   }
 
+  async updateProduct(id: number, updateData: Partial<Product>): Promise<Product> {
+    const [product] = await db.update(products)
+      .set(updateData)
+      .where(eq(products.id, id))
+      .returning();
+    
+    if (!product) {
+      throw new Error('Product not found');
+    }
+    return product;
+  }
+
+  async deleteProduct(id: number): Promise<void> {
+    await db.delete(products).where(eq(products.id, id));
+  }
+
   // Contact Inquiry methods
   async createContactInquiry(insertInquiry: InsertContactInquiry): Promise<ContactInquiry> {
     const [inquiry] = await db.insert(contactInquiries).values(insertInquiry).returning();
@@ -141,111 +177,151 @@ export class DatabaseStorage implements IStorage {
     return post;
   }
 
-  async updateBlogPost(id: number, updateData: any): Promise<any> {
-    const result = await db.update(blogPosts)
+  async updateBlogPost(id: number, updateData: Partial<BlogPost>): Promise<BlogPost> {
+    const [result] = await db.update(blogPosts)
       .set(updateData)
       .where(eq(blogPosts.id, id))
       .returning();
 
-    if (result.length === 0) {
+    if (!result) {
       throw new Error('Blog post not found');
     }
 
-    return result[0];
+    return result;
   }
 
-  // Page Content Management (stub implementations for DatabaseStorage)
-  async getPageContent(): Promise<any[]> {
-    // Return sample page content for now
-    return [
-      {
-        id: 1,
-        pageName: 'home',
-        title: 'Home Page',
-        content: '<h1>Welcome to Elegance Stone</h1><p>Premium natural stone supplier offering the finest marble, granite, and limestone.</p>',
-        metaDescription: 'Premium natural stone supplier - marble, granite, limestone',
-        isPublished: true,
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 2,
-        pageName: 'about',
-        title: 'About Us',
-        content: '<h1>About Elegance Stone</h1><p>We have been providing premium natural stone solutions for over two decades.</p>',
-        metaDescription: 'Learn about Elegance Stone - premium natural stone specialists',
-        isPublished: true,
-        updatedAt: new Date().toISOString()
-      }
-    ];
+  async deleteBlogPost(id: number): Promise<void> {
+    await db.delete(blogPosts).where(eq(blogPosts.id, id));
   }
 
-  async createPageContent(contentData: any): Promise<any> {
-    const newContent = {
-      id: Date.now(), // Simple ID generation
-      ...contentData,
-      updatedAt: new Date().toISOString()
-    };
-    return newContent;
+  // Comprehensive Page Content Management
+  async getPageContents(pageName?: string, language = 'en'): Promise<PageContent[]> {
+    if (pageName) {
+      return await db.select().from(pageContents)
+        .where(and(eq(pageContents.pageName, pageName), eq(pageContents.language, language)));
+    }
+    return await db.select().from(pageContents).where(eq(pageContents.language, language));
   }
 
-  async updatePageContent(id: number, updateData: any): Promise<any> {
-    const updated = {
-      id,
-      ...updateData,
-      updatedAt: new Date().toISOString()
-    };
+  async getPageContentBySection(pageName: string, sectionKey: string, language = 'en'): Promise<PageContent | undefined> {
+    const [content] = await db.select().from(pageContents)
+      .where(and(
+        eq(pageContents.pageName, pageName),
+        eq(pageContents.sectionKey, sectionKey),
+        eq(pageContents.language, language)
+      ));
+    return content || undefined;
+  }
+
+  async createPageContent(contentData: InsertPageContent): Promise<PageContent> {
+    const [content] = await db.insert(pageContents).values(contentData).returning();
+    return content;
+  }
+
+  async updatePageContent(id: number, updateData: Partial<PageContent>): Promise<PageContent> {
+    const [updated] = await db.update(pageContents)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(pageContents.id, id))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('Page content not found');
+    }
     return updated;
   }
 
-  // SEO Settings Management (stub implementations for DatabaseStorage)
-  async getSeoSettings(): Promise<any[]> {
-    // Return sample SEO settings for now
-    return [
-      {
-        id: 1,
-        pageName: 'home',
-        title: 'Elegance Stone - Premium Natural Stone Supplier',
-        description: 'Premium natural stone supplier offering marble, granite, limestone. Professional installation and design services.',
-        keywords: 'marble, granite, limestone, natural stone, stone supplier',
-        ogTitle: 'Elegance Stone - Premium Natural Stone',
-        ogDescription: 'Transform your space with premium natural stone from Elegance Stone',
-        ogImage: 'https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?w=1200&h=630',
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 2,
-        pageName: 'products',
-        title: 'Natural Stone Products - Marble, Granite & Limestone',
-        description: 'Explore our extensive collection of premium natural stone products including marble, granite, and limestone.',
-        keywords: 'marble products, granite slabs, limestone tiles, natural stone collection',
-        ogTitle: 'Premium Natural Stone Products',
-        ogDescription: 'Discover our extensive collection of premium natural stone',
-        ogImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=630',
-        updatedAt: new Date().toISOString()
-      }
-    ];
+  async deletePageContent(id: number): Promise<void> {
+    await db.delete(pageContents).where(eq(pageContents.id, id));
   }
 
-  async createSeoSettings(seoData: any): Promise<any> {
-    const newSeoSettings = {
-      id: Date.now(), // Simple ID generation
-      ...seoData,
-      updatedAt: new Date().toISOString()
-    };
-    return newSeoSettings;
+  // Website Settings Management
+  async getWebsiteSettings(): Promise<WebsiteSetting[]> {
+    return await db.select().from(websiteSettings);
   }
 
-  async updateSeoSettings(id: number, updateData: any): Promise<any> {
-    const updated = {
-      id,
-      ...updateData,
-      updatedAt: new Date().toISOString()
-    };
+  async getWebsiteSettingByKey(key: string): Promise<WebsiteSetting | undefined> {
+    const [setting] = await db.select().from(websiteSettings)
+      .where(eq(websiteSettings.settingKey, key));
+    return setting || undefined;
+  }
+
+  async createWebsiteSetting(setting: InsertWebsiteSetting): Promise<WebsiteSetting> {
+    const [created] = await db.insert(websiteSettings).values(setting).returning();
+    return created;
+  }
+
+  async updateWebsiteSetting(id: number, updateData: Partial<WebsiteSetting>): Promise<WebsiteSetting> {
+    const [updated] = await db.update(websiteSettings)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(websiteSettings.id, id))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('Website setting not found');
+    }
     return updated;
   }
 
+  // SEO Settings Management
+  async getSeoSettings(language = 'en'): Promise<SeoSetting[]> {
+    return await db.select().from(seoSettings)
+      .where(eq(seoSettings.language, language));
+  }
 
-  // Appointment methods
+  async getSeoSettingByPage(pageName: string, language = 'en'): Promise<SeoSetting | undefined> {
+    const [seo] = await db.select().from(seoSettings)
+      .where(and(eq(seoSettings.pageName, pageName), eq(seoSettings.language, language)));
+    return seo || undefined;
+  }
+
+  async createSeoSetting(seoData: InsertSeoSetting): Promise<SeoSetting> {
+    const [seo] = await db.insert(seoSettings).values(seoData).returning();
+    return seo;
+  }
+
+  async updateSeoSetting(id: number, updateData: Partial<SeoSetting>): Promise<SeoSetting> {
+    const [updated] = await db.update(seoSettings)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(seoSettings.id, id))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('SEO setting not found');
+    }
+    return updated;
+  }
+
+  async deleteSeoSetting(id: number): Promise<void> {
+    await db.delete(seoSettings).where(eq(seoSettings.id, id));
+  }
+
+  // Media Library Management
+  async getMediaFiles(): Promise<MediaFile[]> {
+    return await db.select().from(mediaLibrary);
+  }
+
+  async createMediaFile(media: InsertMediaFile): Promise<MediaFile> {
+    const [file] = await db.insert(mediaLibrary).values(media).returning();
+    return file;
+  }
+
+  async updateMediaFile(id: number, updateData: Partial<MediaFile>): Promise<MediaFile> {
+    const [updated] = await db.update(mediaLibrary)
+      .set(updateData)
+      .where(eq(mediaLibrary.id, id))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('Media file not found');
+    }
+    return updated;
+  }
+
+  async deleteMediaFile(id: number): Promise<void> {
+    await db.delete(mediaLibrary).where(eq(mediaLibrary.id, id));
+  }
+
+  // Enhanced feature methods (existing implementations...)
   async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
     const [appointment] = await db.insert(appointments).values(insertAppointment).returning();
     return appointment;
@@ -255,7 +331,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(appointments);
   }
 
-  // Quote Request methods
   async createQuoteRequest(insertQuoteRequest: InsertQuoteRequest): Promise<QuoteRequest> {
     const [quoteRequest] = await db.insert(quoteRequests).values(insertQuoteRequest).returning();
     return quoteRequest;
@@ -265,7 +340,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(quoteRequests);
   }
 
-  // Customer Review methods
   async createCustomerReview(insertReview: InsertCustomerReview): Promise<CustomerReview> {
     const [review] = await db.insert(customerReviews).values(insertReview).returning();
     return review;
@@ -279,7 +353,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(customerReviews).where(eq(customerReviews.productId, productId));
   }
 
-  // Project Gallery methods
   async createProjectGallery(insertProject: InsertProjectGallery): Promise<ProjectGallery> {
     const [project] = await db.insert(projectGallery).values(insertProject).returning();
     return project;
@@ -293,7 +366,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(projectGallery).where(eq(projectGallery.featured, true));
   }
 
-  // Wishlist methods
   async createWishlist(insertWishlist: InsertWishlist): Promise<Wishlist> {
     const [wishlist] = await db.insert(wishlists).values(insertWishlist).returning();
     return wishlist;
@@ -305,11 +377,9 @@ export class DatabaseStorage implements IStorage {
 
   async removeFromWishlist(userId: number, productId: number): Promise<void> {
     await db.delete(wishlists)
-      .where(eq(wishlists.userId, userId))
-      .where(eq(wishlists.productId, productId));
+      .where(and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)));
   }
 
-  // Price Calculation methods
   async createPriceCalculation(insertCalculation: InsertPriceCalculation): Promise<PriceCalculation> {
     const [calculation] = await db.insert(priceCalculations).values(insertCalculation).returning();
     return calculation;
@@ -319,7 +389,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(priceCalculations);
   }
 
-  // Chat Message methods
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
     const [message] = await db.insert(chatMessages).values(insertMessage).returning();
     return message;
@@ -329,7 +398,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(chatMessages).where(eq(chatMessages.sessionId, sessionId));
   }
 
-  // Maintenance Guide methods
   async createMaintenanceGuide(insertGuide: InsertMaintenanceGuide): Promise<MaintenanceGuide> {
     const [guide] = await db.insert(maintenanceGuides).values(insertGuide).returning();
     return guide;
