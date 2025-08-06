@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle, Hammer, Palette, Shield, Users, Wrench } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Services() {
   const { t, language } = useLanguage();

@@ -11,6 +11,7 @@ import {
 import { useLanguage } from "@/contexts/language-context";
 import LanguageSwitcher from "@/components/language-switcher";
 import CartButton from "@/components/cart-button";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,7 +46,13 @@ export default function Navigation() {
                 <span className="text-white font-bold text-lg">E</span>
               </div>
               <div className="font-bold text-xl text-stone-dark group-hover:text-stone-bronze transition-colors">
-                <span className="text-stone-bronze">{language === 'fa' ? 'اِلِگانس' : 'Elegance'}</span> {language === 'fa' ? 'سنگ' : 'Stone'}
+                <EditableContent
+                  pageName="global"
+                  sectionKey="company_name"
+                  defaultContent="Elegance Stone"
+                  multiline={false}
+                  placeholder="Company name..."
+                />
               </div>
             </div>
           </Link>

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link } from "wouter";
 import { ArrowRight, Award, Heart, Shield, Star } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function About() {
   const { t, language } = useLanguage();
@@ -70,12 +71,22 @@ export default function About() {
       <section className="py-20 bg-stone-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}>
-              {t("about.title")}
-            </h1>
-            <p className={`text-xl text-stone-gray max-w-2xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}>
-              {t("about.subtitle")}
-            </p>
+            <EditableContent
+              pageName="about"
+              sectionKey="hero_title"
+              defaultContent="About Elegance Stone"
+              className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}
+              as="h1"
+              multiline={false}
+            />
+            <EditableContent
+              pageName="about"
+              sectionKey="hero_subtitle"
+              defaultContent="Crafting premium natural stone solutions with over 15 years of expertise"
+              className={`text-xl text-stone-gray max-w-2xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}
+              as="p"
+              multiline={true}
+            />
           </div>
         </div>
       </section>
@@ -85,26 +96,38 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-stone-dark mb-6">
-                Our Story
-              </h2>
-              <p className="text-lg text-stone-gray mb-6 leading-relaxed">
-                Founded with a vision to bring the natural beauty of stone into modern living spaces, 
-                Elegance Stone has grown from a small local business into a trusted name in the industry. 
-                Our journey began with a simple belief: that natural stone has the power to transform 
-                ordinary spaces into extraordinary experiences.
-              </p>
-              <p className="text-lg text-stone-gray mb-6 leading-relaxed">
-                Over the years, we have built our reputation on three core principles: exceptional quality, 
-                personalized service, and innovative design solutions. Every project we undertake reflects 
-                our commitment to these values, ensuring that our clients receive not just a product, 
-                but a complete experience.
-              </p>
-              <p className="text-lg text-stone-gray mb-8 leading-relaxed">
-                Today, we continue to push the boundaries of what's possible with natural stone, 
-                combining traditional craftsmanship with cutting-edge technology to create stunning 
-                installations that stand the test of time.
-              </p>
+              <EditableContent
+                pageName="about"
+                sectionKey="story_title"
+                defaultContent="Our Story"
+                className="text-4xl md:text-5xl font-bold text-stone-dark mb-6"
+                as="h2"
+                multiline={false}
+              />
+              <EditableContent
+                pageName="about"
+                sectionKey="story_paragraph_1"
+                defaultContent="Founded with a vision to bring the natural beauty of stone into modern living spaces, Elegance Stone has grown from a small local business into a trusted name in the industry. Our journey began with a simple belief: that natural stone has the power to transform ordinary spaces into extraordinary experiences."
+                className="text-lg text-stone-gray mb-6 leading-relaxed"
+                as="p"
+                multiline={true}
+              />
+              <EditableContent
+                pageName="about"
+                sectionKey="story_paragraph_2"
+                defaultContent="Over the years, we have built our reputation on three core principles: exceptional quality, personalized service, and innovative design solutions. Every project we undertake reflects our commitment to these values, ensuring that our clients receive not just a product, but a complete experience."
+                className="text-lg text-stone-gray mb-6 leading-relaxed"
+                as="p"
+                multiline={true}
+              />
+              <EditableContent
+                pageName="about"
+                sectionKey="story_paragraph_3"
+                defaultContent="Today, we continue to push the boundaries of what's possible with natural stone, combining traditional craftsmanship with cutting-edge technology to create stunning installations that stand the test of time."
+                className="text-lg text-stone-gray mb-8 leading-relaxed"
+                as="p"
+                multiline={true}
+              />
               <Button asChild size="lg" className="bg-stone-bronze hover:bg-orange-600 text-white">
                 <Link href="/contact">
                   <ArrowRight className="mr-2 h-5 w-5" />
@@ -127,12 +150,22 @@ export default function About() {
       <section className="py-20 bg-stone-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-stone-dark mb-4">
-              Our Values
-            </h2>
-            <p className="text-xl text-stone-gray">
-              The principles that guide everything we do
-            </p>
+            <EditableContent
+              pageName="about"
+              sectionKey="values_title"
+              defaultContent="Our Values"
+              className="text-4xl md:text-5xl font-bold text-stone-dark mb-4"
+              as="h2"
+              multiline={false}
+            />
+            <EditableContent
+              pageName="about"
+              sectionKey="values_subtitle"
+              defaultContent="The principles that guide everything we do"
+              className="text-xl text-stone-gray"
+              as="p"
+              multiline={true}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

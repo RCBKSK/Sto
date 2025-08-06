@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Linkedin, MessageCircle, Calendar } from "lucide-react";
 import { insertContactInquirySchema } from "@shared/schema";
+import { EditableContent } from "@/components/cms/editable-content";
 
 const formSchema = insertContactInquirySchema.extend({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -100,13 +101,22 @@ export default function Contact() {
       <section className="py-20 bg-stone-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-stone-dark mb-6">
-              Contact Us
-            </h1>
-            <p className="text-xl text-stone-gray max-w-2xl mx-auto">
-              Ready to start your natural stone project? Get in touch with our expert team 
-              for a consultation and personalized quote.
-            </p>
+            <EditableContent
+              pageName="contact"
+              sectionKey="hero_title"
+              defaultContent="Contact Us"
+              className="text-4xl md:text-6xl font-bold text-stone-dark mb-6"
+              as="h1"
+              multiline={false}
+            />
+            <EditableContent
+              pageName="contact"
+              sectionKey="hero_subtitle"
+              defaultContent="Ready to start your natural stone project? Get in touch with our expert team for a consultation and personalized quote."
+              className="text-xl text-stone-gray max-w-2xl mx-auto"
+              as="p"
+              multiline={true}
+            />
           </div>
         </div>
       </section>

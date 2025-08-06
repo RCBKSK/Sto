@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Footer() {
   const { t, language } = useLanguage();
@@ -21,12 +22,23 @@ export default function Footer() {
                 <span className="text-white font-bold text-lg">E</span>
               </div>
               <div className="font-bold text-2xl">
-                <span className="text-stone-bronze">{t("footer.company")}</span>
+                <EditableContent
+                  pageName="global"
+                  sectionKey="footer_company_name"
+                  defaultContent="Elegance Stone"
+                  className="text-stone-bronze"
+                  multiline={false}
+                />
               </div>
             </div>
-            <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
-              {t("footer.description")}
-            </p>
+            <EditableContent
+              pageName="global"
+              sectionKey="footer_description"
+              defaultContent="Premium natural stone supplier specializing in cladding, tiles, and design solutions. Quality and craftsmanship since 2010."
+              className="text-gray-400 mb-6 max-w-md leading-relaxed"
+              as="p"
+              multiline={true}
+            />
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-stone-bronze transition-colors transform hover:scale-110 duration-200">
                 <Facebook className="h-5 w-5" />
@@ -45,7 +57,14 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">{t("footer.quickLinks")}</h3>
+            <EditableContent
+              pageName="global"
+              sectionKey="footer_quicklinks_title"
+              defaultContent="Quick Links"
+              className="font-semibold text-lg mb-4"
+              as="h3"
+              multiline={false}
+            />
             <ul className="space-y-2">
               <li><Link href="/" className="text-gray-400 hover:text-white transition-colors fluid-hover">{t("nav.home")}</Link></li>
               <li><Link href="/products" className="text-gray-400 hover:text-white transition-colors fluid-hover">{t("nav.products")}</Link></li>
@@ -58,7 +77,14 @@ export default function Footer() {
 
           {/* Products */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">{t("footer.ourServices")}</h3>
+            <EditableContent
+              pageName="global"
+              sectionKey="footer_services_title"
+              defaultContent="Our Services"
+              className="font-semibold text-lg mb-4"
+              as="h3"
+              multiline={false}
+            />
             <ul className="space-y-2">
               <li><Link href="/products?category=limestone" className="text-gray-400 hover:text-white transition-colors">Limestone</Link></li>
               <li><Link href="/products?category=marble" className="text-gray-400 hover:text-white transition-colors">Marble</Link></li>
@@ -70,9 +96,14 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">
-            © 2024 {t("footer.company")}. {t("footer.allRightsReserved")}
-          </p>
+          <EditableContent
+            pageName="global"
+            sectionKey="footer_copyright"
+            defaultContent="© 2024 Elegance Stone. All rights reserved."
+            className="text-gray-400"
+            as="p"
+            multiline={false}
+          />
         </div>
       </div>
     </footer>

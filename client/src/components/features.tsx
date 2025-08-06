@@ -1,5 +1,6 @@
 import { Shield, Truck, Phone, Award, Clock, Hammer } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Features() {
   const { t, language } = useLanguage();
@@ -50,12 +51,22 @@ export default function Features() {
               {language === 'fa' ? 'مزایای ما' : 'Why Choose Us'}
             </span>
           </div>
-          <h2 className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}>
-            {t("features.title")}
-          </h2>
-          <p className={`text-xl text-stone-gray max-w-3xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}>
-            {t("features.subtitle")}
-          </p>
+          <EditableContent
+            pageName="home"
+            sectionKey="features_title"
+            defaultContent="Why Choose Elegance Stone"
+            className={`text-4xl md:text-6xl font-bold text-stone-dark mb-6 ${language === 'fa' ? 'font-vazir' : ''}`}
+            as="h2"
+            multiline={false}
+          />
+          <EditableContent
+            pageName="home"
+            sectionKey="features_subtitle"
+            defaultContent="Discover what makes us the preferred choice for premium natural stone solutions"
+            className={`text-xl text-stone-gray max-w-3xl mx-auto ${language === 'fa' ? 'font-vazir' : ''}`}
+            as="p"
+            multiline={true}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -75,12 +86,22 @@ export default function Features() {
                 <div className="absolute inset-0 w-20 h-20 bg-stone-gold/20 rounded-2xl animate-pulse"></div>
               </div>
               
-              <h3 className={`text-xl font-bold text-stone-dark mb-4 group-hover:text-stone-bronze transition-colors ${language === 'fa' ? 'font-vazir' : ''}`}>
-                {feature.title}
-              </h3>
-              <p className={`text-stone-gray leading-relaxed ${language === 'fa' ? 'font-vazir text-right' : ''}`}>
-                {feature.description}
-              </p>
+              <EditableContent
+                pageName="home"
+                sectionKey={`feature_${index + 1}_title`}
+                defaultContent={feature.title}
+                className={`text-xl font-bold text-stone-dark mb-4 group-hover:text-stone-bronze transition-colors ${language === 'fa' ? 'font-vazir' : ''}`}
+                as="h3"
+                multiline={false}
+              />
+              <EditableContent
+                pageName="home"
+                sectionKey={`feature_${index + 1}_description`}
+                defaultContent={feature.description}
+                className={`text-stone-gray leading-relaxed ${language === 'fa' ? 'font-vazir text-right' : ''}`}
+                as="p"
+                multiline={true}
+              />
               
               {/* Hover accent line */}
               <div className="w-12 h-1 bg-stone-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left mt-4"></div>

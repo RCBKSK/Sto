@@ -17,6 +17,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@shared/schema";
 import { products, categories } from "@/data/products";
+import { EditableContent } from "@/components/cms/editable-content";
 
 export default function Products() {
   const [location] = useLocation();
@@ -67,13 +68,22 @@ export default function Products() {
       <section className="py-20 bg-stone-beige">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-stone-dark mb-6">
-              Our Products
-            </h1>
-            <p className="text-xl text-stone-gray max-w-2xl mx-auto">
-              Discover our comprehensive collection of premium natural stone products, 
-              carefully curated for exceptional quality and timeless beauty.
-            </p>
+            <EditableContent
+              pageName="products"
+              sectionKey="hero_title"
+              defaultContent="Our Products"
+              className="text-4xl md:text-6xl font-bold text-stone-dark mb-6"
+              as="h1"
+              multiline={false}
+            />
+            <EditableContent
+              pageName="products"
+              sectionKey="hero_subtitle"
+              defaultContent="Discover our comprehensive collection of premium natural stone products, carefully curated for exceptional quality and timeless beauty."
+              className="text-xl text-stone-gray max-w-2xl mx-auto"
+              as="p"
+              multiline={true}
+            />
           </div>
         </div>
       </section>
