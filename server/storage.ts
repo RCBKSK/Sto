@@ -13,19 +13,7 @@ export class MemStorage implements IStorage {
   private currentInquiryId: number;
   private currentBlogId: number;
 
-  constructor() {
-    this.users = new Map();
-    this.products = new Map();
-    this.contactInquiries = new Map();
-    this.blogPosts = new Map();
-    this.currentUserId = 1;
-    this.currentProductId = 1;
-    this.currentInquiryId = 1;
-    this.currentBlogId = 1;
-
-    // Initialize with sample data
-    this.initializeData();
-  }
+  
 
   private initializeData() {
     // Sample products
@@ -158,6 +146,64 @@ export class MemStorage implements IStorage {
       this.blogPosts.set(post.id, blogPost);
       this.currentBlogId = Math.max(this.currentBlogId, post.id + 1);
     });
+
+    // Sample page content
+    const samplePageContent = [
+      {
+        id: 1,
+        pageName: 'home',
+        title: 'Home Page',
+        content: '<h1>Welcome to Elegance Stone</h1><p>Premium natural stone supplier offering the finest marble, granite, and limestone.</p>',
+        metaDescription: 'Premium natural stone supplier - marble, granite, limestone',
+        isPublished: true,
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 2,
+        pageName: 'about',
+        title: 'About Us',
+        content: '<h1>About Elegance Stone</h1><p>We have been providing premium natural stone solutions for over two decades.</p>',
+        metaDescription: 'Learn about Elegance Stone - premium natural stone specialists',
+        isPublished: true,
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    samplePageContent.forEach(content => {
+      this.pageContent.set(content.id, content);
+      this.currentPageContentId = Math.max(this.currentPageContentId, content.id + 1);
+    });
+
+    // Sample SEO settings
+    const sampleSeoSettings = [
+      {
+        id: 1,
+        pageName: 'home',
+        title: 'Elegance Stone - Premium Natural Stone Supplier',
+        description: 'Premium natural stone supplier offering marble, granite, limestone. Professional installation and design services.',
+        keywords: 'marble, granite, limestone, natural stone, stone supplier',
+        ogTitle: 'Elegance Stone - Premium Natural Stone',
+        ogDescription: 'Transform your space with premium natural stone from Elegance Stone',
+        ogImage: 'https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?w=1200&h=630',
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 2,
+        pageName: 'products',
+        title: 'Natural Stone Products - Marble, Granite & Limestone',
+        description: 'Explore our extensive collection of premium natural stone products including marble, granite, and limestone.',
+        keywords: 'marble products, granite slabs, limestone tiles, natural stone collection',
+        ogTitle: 'Premium Natural Stone Products',
+        ogDescription: 'Discover our extensive collection of premium natural stone',
+        ogImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=630',
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    sampleSeoSettings.forEach(seo => {
+      this.seoSettings.set(seo.id, seo);
+      this.currentSeoSettingsId = Math.max(this.currentSeoSettingsId, seo.id + 1);
+    });
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -253,6 +299,29 @@ export class MemStorage implements IStorage {
     return post;
   }
 
+  private pageContent: Map<number, any>;
+  private seoSettings: Map<number, any>;
+  private currentPageContentId: number;
+  private currentSeoSettingsId: number;
+
+  constructor() {
+    this.users = new Map();
+    this.products = new Map();
+    this.contactInquiries = new Map();
+    this.blogPosts = new Map();
+    this.pageContent = new Map();
+    this.seoSettings = new Map();
+    this.currentUserId = 1;
+    this.currentProductId = 1;
+    this.currentInquiryId = 1;
+    this.currentBlogId = 1;
+    this.currentPageContentId = 1;
+    this.currentSeoSettingsId = 1;
+
+    // Initialize with sample data
+    this.initializeData();
+  }
+
   // Enhanced features methods (stub implementations for MemStorage)
   async createAppointment(appointment: any): Promise<any> {
     return { id: 1, ...appointment, createdAt: new Date() };
@@ -303,113 +372,81 @@ export class MemStorage implements IStorage {
   }
 
   async removeFromWishlist(userId: number, productId: number): Promise<void> {
-    const wishlistItems = await this.getWishlistByUserId(userId);
-    const filtered = wishlistItems.filter(item => item.productId !== productId);
-    this.data.wishlist = this.data.wishlist.filter(item => !(item.userId === userId && item.productId === productId));
-    await this.saveData();
+    // No-op for MemStorage
   }
 
   // Page Content Management
   async getPageContent(): Promise<any[]> {
-    return this.data.pageContent || [];
+    return Array.from(this.pageContent.values());
   }
 
   async createPageContent(contentData: any): Promise<any> {
-    if (!this.data.pageContent) {
-      this.data.pageContent = [];
-    }
+    const id = this.currentPageContentId++;
     const newContent = {
-      id: Date.now(),
+      id,
       ...contentData,
       updatedAt: new Date().toISOString()
     };
-    this.data.pageContent.push(newContent);
-    await this.saveData();
+    this.pageContent.set(id, newContent);
     return newContent;
   }
 
   async updatePageContent(id: number, updateData: any): Promise<any> {
-    if (!this.data.pageContent) {
-      this.data.pageContent = [];
-    }
-    const index = this.data.pageContent.findIndex(content => content.id === id);
-    if (index === -1) {
+    const existing = this.pageContent.get(id);
+    if (!existing) {
       throw new Error('Page content not found');
     }
-    this.data.pageContent[index] = {
-      ...this.data.pageContent[index],
+    const updated = {
+      ...existing,
       ...updateData,
       updatedAt: new Date().toISOString()
     };
-    await this.saveData();
-    return this.data.pageContent[index];
+    this.pageContent.set(id, updated);
+    return updated;
   }
 
   // SEO Settings Management
   async getSeoSettings(): Promise<any[]> {
-    return this.data.seoSettings || [];
+    return Array.from(this.seoSettings.values());
   }
 
   async createSeoSettings(seoData: any): Promise<any> {
-    if (!this.data.seoSettings) {
-      this.data.seoSettings = [];
-    }
+    const id = this.currentSeoSettingsId++;
     const newSeoSettings = {
-      id: Date.now(),
+      id,
       ...seoData,
       updatedAt: new Date().toISOString()
     };
-    this.data.seoSettings.push(newSeoSettings);
-    await this.saveData();
+    this.seoSettings.set(id, newSeoSettings);
     return newSeoSettings;
   }
 
   async updateSeoSettings(id: number, updateData: any): Promise<any> {
-    if (!this.data.seoSettings) {
-      this.data.seoSettings = [];
-    }
-    const index = this.data.seoSettings.findIndex(settings => settings.id === id);
-    if (index === -1) {
+    const existing = this.seoSettings.get(id);
+    if (!existing) {
       throw new Error('SEO settings not found');
     }
-    this.data.seoSettings[index] = {
-      ...this.data.seoSettings[index],
+    const updated = {
+      ...existing,
       ...updateData,
       updatedAt: new Date().toISOString()
     };
-    await this.saveData();
-    return this.data.seoSettings[index];
+    this.seoSettings.set(id, updated);
+    return updated;
   }
 
-  // Blog Post Management
-  async createBlogPost(postData: any): Promise<any> {
-    if (!this.data.blogPosts) {
-      this.data.blogPosts = [];
-    }
-    const newPost = {
-      id: Date.now(),
-      ...postData,
-      publishedAt: postData.publishedAt || new Date().toISOString()
-    };
-    this.data.blogPosts.push(newPost);
-    await this.saveData();
-    return newPost;
-  }
-
+  // Blog Post Management - Updated to use Map storage
   async updateBlogPost(id: number, updateData: any): Promise<any> {
-    if (!this.data.blogPosts) {
-      this.data.blogPosts = [];
-    }
-    const index = this.data.blogPosts.findIndex(post => post.id === id);
-    if (index === -1) {
+    const existing = this.blogPosts.get(id);
+    if (!existing) {
       throw new Error('Blog post not found');
     }
-    this.data.blogPosts[index] = {
-      ...this.data.blogPosts[index],
+    const updated = {
+      ...existing,
       ...updateData
     };
-    await this.saveData();
-    return this.data.blogPosts[index];
+    this.blogPosts.set(id, updated);
+    return updated;
   }
 }
 
