@@ -18,10 +18,13 @@ interface PageContent {
   id: number;
   pageName: string;
   sectionKey: string;
-  contentType: string;
+  sectionType: string;
+  title?: string;
   content: any;
-  isPublished: boolean;
+  mediaUrl?: string;
   language: string;
+  isPublished: boolean;
+  sortOrder: number;
   updatedAt: string;
 }
 
@@ -382,7 +385,7 @@ export default function AdminContent() {
                           <Badge variant={content.isPublished ? 'default' : 'secondary'}>
                             {content.isPublished ? 'Published' : 'Draft'}
                           </Badge>
-                          <Badge variant="outline">{content.contentType}</Badge>
+                          <Badge variant="outline">{content.sectionType}</Badge>
                         </CardTitle>
                         <CardDescription>
                           Page: {content.pageName} • Updated: {new Date(content.updatedAt).toLocaleDateString()}
@@ -709,17 +712,20 @@ function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent;
   const [formData, setFormData] = useState({
     pageName: initialData?.pageName || 'home',
     sectionKey: initialData?.sectionKey || '',
-    contentType: initialData?.contentType || 'text',
+    sectionType: initialData?.sectionType || 'text',
+    title: initialData?.title || '',
     content: initialData?.content || '',
+    mediaUrl: initialData?.mediaUrl || '',
     isPublished: initialData?.isPublished ?? true,
     language: initialData?.language || 'en',
+    sortOrder: initialData?.sortOrder || 0,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     let processedContent = formData.content;
-    if (formData.contentType === 'json' && typeof formData.content === 'string') {
+    if (formData.sectionType === 'json' && typeof formData.content === 'string') {
       try {
         processedContent = JSON.parse(formData.content);
       } catch (e) {
@@ -760,8 +766,8 @@ function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent;
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="contentType">Content Type</Label>
-          <Select value={formData.contentType} onValueChange={(value) => setFormData({ ...formData, contentType: value })}>
+          <Label htmlFor="sectionType">Content Type</Label>
+          <Select value={formData.sectionType} onValueChange={(value) => setFormData({ ...formData, sectionType: value })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -792,12 +798,12 @@ function PageContentForm({ initialData, onSubmit }: { initialData?: PageContent;
           id="content"
           value={typeof formData.content === 'object' ? JSON.stringify(formData.content, null, 2) : formData.content}
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          placeholder={`Enter ${formData.contentType} content...`}
-          rows={formData.contentType === 'json' ? 10 : 6}
-          className={formData.contentType === 'json' ? 'font-mono text-sm' : ''}
+          placeholder={`Enter ${formData.sectionType} content...`}
+          rows={formData.sectionType === 'json' ? 10 : 6}
+          className={formData.sectionType === 'json' ? 'font-mono text-sm' : ''}
           required
         />
-        {formData.contentType === 'json' && (
+        {formData.sectionType === 'json' && (
           <p className="text-xs text-muted-foreground">
             Enter valid JSON. For images: {`{"url": "...", "alt": "...", "caption": "..."}`}
           </p>
